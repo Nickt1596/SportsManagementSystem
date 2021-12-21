@@ -1,0 +1,85 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Game Manager {% endblock title %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+<div class="card mb-4">
+<div class="card-header">
+	<h3 class="mb-0">Ice Slot Scheduler</h3>
+</div>
+
+
+<div class="card-body">
+	<form id="form-container" method="POST">
+		{% csrf_token %}
+		{{ formset.management_form }}
+		{% for form in formset %}
+		<div class="form-row align-items-center" id="gameForm">
+			<div class="col-auto">
+				<div class="form-group">
+					<label class="form-control-label">{{ form.homeTeam.label }}</label>
+					{{ form.homeTeam }}
+				</div>
+			</div>
+			<div class="col-auto">
+				<div class="form-group">
+					<label class="form-control-label">{{ form.awayTeam.label }}</label>
+					{{ form.awayTeam }}
+				</div>
+			</div>
+			<div class="col-auto">
+				<div class="form-group">
+					<label class="form-control-label">{{ form.iceSlot.label }}</label>
+					{{ form.iceSlot }}
+				</div>
+			</div>
+			<div class="col-auto">
+				<div class="form-group">
+					<label class="form-control-label">{{ form.scorekeeper.label }}</label>
+					{{ form.scorekeeper }}
+				</div>
+			</div>
+			<div class="col-auto">
+				<div class="form-group">
+					<label class="form-control-label">{{ form.referees.label }}</label>
+					{{ form.referees }}
+				</div>
+			</div>
+		</div>
+		<button type="submit" class="btn btn-fill btn-primary" id="submitButton">Submit</button>
+    <button type="button" class="btn btn-primary" id="addAnother">+</button>
+	{% endfor %}
+	</form>
+</div>
+</div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE -->
+{% block javascripts %}
+<script>
+	let iceSlotForm = document.querySelectorAll(".form-row")
+	let container = document.querySelector("#form-container")
+	let addMoreBtn = document.querySelector("#addAnother")
+	let totalForms = document.querySelector("#id_form-TOTAL_FORMS")
+	let submitButton = document.querySelector("#submitButton")
+
+	let formNum = iceSlotForm.length-1
+	addMoreBtn.addEventListener('click', add_new_form)
+
+	function add_new_form(event)
+	{
+			event.preventDefault()
+			let newForm = iceSlotForm[0].cloneNode(true)
+			let formRegex = RegExp(`form-(\\d){1}-`,'g')
+			formNum++
+
+			newForm.innerHTML = newForm.innerHTML.replace(formRegex, `form-${formNum}-`)
+      container.insertBefore(newForm, submitButton)
+      totalForms.setAttribute('value', `${formNum+1}`)
+	}
+</script>
+{% endblock javascripts %}
