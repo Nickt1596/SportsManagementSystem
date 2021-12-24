@@ -60,7 +60,6 @@ GameFormSet = modelformset_factory(
         # })
     }
 
-
 )
 
 
@@ -109,3 +108,46 @@ IceSlotFormSet = modelformset_factory(
         }),
     }
 )
+
+
+class SeasonForm(ModelForm):
+    class Meta:
+        model = Season
+        fields = ['name', 'startDate', 'endDate', 'numGames']
+        labels = {
+            'name': 'Season Name',
+            'startDate': 'Start Date',
+            'endDate': 'End Date',
+            'numGames': '# of Games',
+        }
+        widgets = {
+            'startDate': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date',
+                'id': 'seasonStartDate',
+                'value': date.today()
+            }),
+            'endDate': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date',
+                'id': 'seasonEndDate',
+                'value': date.today()
+            }),
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'id': 'seasonName'
+            }),
+            'numGames': forms.TextInput(attrs={
+                'class': 'form-control',
+                'id': 'seasonNumGames'
+            }),
+        }
+
+    # def __init__(self, *args, **kwargs):
+    #     super(SeasonForm, self).__init__(*args, **kwargs)
+    #
+    #     for name, field in self.fields.items():
+    #         field.widget.attrs.update({'class': 'form-control'})
+    #
+    #     self.fields['startDate'].widget.attrs.update({'type': 'date', 'id': 'seasonStartDate', 'value': date.today()})
+    #     self.fields['endDate'].widget.attrs.update({'type': 'date', 'id': 'seasonStartDate', 'value': date.today()})

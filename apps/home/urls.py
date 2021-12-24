@@ -11,10 +11,15 @@ urlpatterns = [
     # The home page
     path('', views.index, name='home'),
     path('referees/', views.referees, name="referees"),
+    path('scorekeepers/', views.scorekeepers, name="scorekeepers"),
     path('rinks/', views.rinks, name="rinks"),
-    path('game-form/', views.addGame, name="addGame"),
+    path('divisions/', views.divisions, name="divisions"),
+    path('divisions-teams/', views.divisionsAndTeams, name="divisionsAndTeams"),
     path('ice-slot-manager/', views.iceSlotManager, name="iceSlotManager"),
     path('game-manager/', views.gameManager, name="gameManager"),
+    path('create-new-season/', views.addSeason, name="addSeason"),
+    path('select-game/', views.selectGame, name="selectGame"),
+    path('game-report-roster/<str:pk>', views.gameReportRoster, name="gameReportRoster"),
 
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),

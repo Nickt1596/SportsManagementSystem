@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Division Table {% endblock %}
+{% block title %} Division and Teams {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
@@ -22,7 +22,7 @@
 						<h6 class="h2 text-white d-inline-block mb-0">League Info</h6>
 						<nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
 							<ol class="breadcrumb breadcrumb-links breadcrumb-dark">
-								<li class="breadcrumb-item active" aria-current="page">Divisions</li>
+								<li class="breadcrumb-item active" aria-current="page">Divisions and Teams</li>
 							</ol>
 						</nav>
 					</div>
@@ -39,30 +39,46 @@
 	<div class="container-fluid mt--6">
 
 		<!-- Table -->
+		{% for division in divisions %}
 		<div class="row">
 			<div class="col">
 				<div class="card">
 					<!-- Card header -->
-					<div class="card-header">
-						<h3 class="mb-0">Divisions</h3>
+					<div class="card-header border-0">
+						<div class="row">
+
+							<div class="col-6">
+								<h3 class="mb-0">{{ division.name }}</h3>
+							</div>
+
+
+						</div>
 					</div>
-					<div class="table-responsive py-4">
-						<table class="table table-flush" id="datatable-basic">
+
+
+					<!-- Light table -->
+					<div class="table-responsive">
+						<table class="table align-items-center table-flush table-hover">
+
 							<thead class="thead-light">
 							<tr>
-								<th>Name</th>
+								<th>Team Name</th>
+								<th>Sample 2</th>
+								<th>Sample 3</th>
 							</tr>
 							</thead>
-							<tfoot>
-							<tr>
-								<th>Name</th>
-							</tr>
-							</tfoot>
+
+
 							<tbody>
-							{% for division in divisions %}
+
+							{% for team in teams %}
+								{% if team.division_id == division.id %}
 								<tr>
-									<td>{{ division.name }}</td>
+									<td>{{ team.name }}</td>
+									<td>Sample 2</td>
+									<td>Sample 3</td>
 								</tr>
+								{% endif %}
 							{% endfor %}
 							</tbody>
 						</table>
@@ -70,6 +86,8 @@
 				</div>
 			</div>
 		</div>
+		{% endfor %}
+
 
 		{% include 'includes/footer.html' %}
 

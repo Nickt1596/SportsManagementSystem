@@ -31,6 +31,7 @@ class Season(models.Model):
     endDate = models.DateField(null=True, blank=True)
     name = models.CharField(max_length=50)
     numGames = models.CharField(max_length=3)
+    currentSeason = models.BooleanField(default=False)
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
 
     def __str__(self):
@@ -51,6 +52,7 @@ class Division(models.Model):
 class Team(models.Model):
     name = models.CharField(max_length=80)
     division = models.ForeignKey(Division, on_delete=models.CASCADE, blank=True, null=True)
+    seasons = models.ManyToManyField(Season, blank=True, null=True)
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
 
     def __str__(self):
@@ -73,6 +75,7 @@ class TeamStats(models.Model):
     regLoses = models.IntegerField(default=0)
     otWins = models.IntegerField(default=0)
     otLoses = models.IntegerField(default=0)
+    season = models.ForeignKey(Season, on_delete=models.CASCADE, blank=True, null=True)
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
 
     def __str__(self):
@@ -109,7 +112,7 @@ class PlayerStats(models.Model):
     gamesPlayed = models.IntegerField(default=0)
     playoffEligible = models.BooleanField(default=False)
     player = models.ForeignKey(Player, on_delete=models.CASCADE, blank=True, null=True)
-    team = models.ForeignKey(Team, on_delete=models.CASCADE, blank=True, null=True)
+    season = models.ForeignKey(Season, on_delete=models.CASCADE, blank=True, null=True)
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
 
     def __str__(self):
@@ -167,7 +170,8 @@ class IceSlot(models.Model):
 class Game(models.Model):
     homeTeam = models.ForeignKey(Team, on_delete=models.CASCADE, blank=True, null=True, related_name='Home_Team')
     awayTeam = models.ForeignKey(Team, on_delete=models.CASCADE, blank=True, null=True, related_name='Away_Team')
-    iceSlot = models.ForeignKey(IceSlot, on_delete=models.CASCADE, blank=True, null=True, limit_choices_to={'available': True})
+    iceSlot = models.ForeignKey(IceSlot, on_delete=models.CASCADE, blank=True, null=True,
+                                limit_choices_to={'available': True})
     scorekeeper = models.ForeignKey(Scorekeeper, on_delete=models.CASCADE, blank=True, null=True)
     referees = models.ManyToManyField(Referee, blank=True, null=True)
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
@@ -401,6 +405,35 @@ def generateReferees():
 def generateScorekeepers():
     for i in range(20):
         newScorekeeper = Scorekeeper(name=names.get_full_name(),
-                         phoneNumber=str(random.randint(1111111111, 9999999999)),
-                         email='sample@gmail.com')
+                                     phoneNumber=str(random.randint(1111111111, 9999999999)),
+                                     email='sample@gmail.com')
         newScorekeeper.save()
+
+
+# For when a new season is added, and they opt to import last seasons data
+def seasonImport(season):
+    currentSeason = Season.objects.filter(currentSeason=True)
+    divisions = Division.objects.filter(seasons__in=currentSeason).values()
+    teams = Team.objects.filter(seasons__in=currentSeason).values()
+    playerStats = PlayerStats.objects.filter(season__in=currentSeason).values()
+    teamStats = TeamStats.objects.filter(season__in=currentSeason).values()
+
+    for division in divisions:
+        updateDivision = Division.objects.get(name=division['name'])
+        updateDivision.seasons.add(season)
+        updateDivision.save()
+
+    for team in teams:
+        updateTeam = Team.objects.get(name=team['name'])
+        updateTeam.seasons.add(season)
+        updateTeam.save()
+
+    for playerStat in playerStats:
+        player = Player.objects.get(id=playerStat['player_id'])
+        newPlayerStat = PlayerStats(player=player, season=season)
+        newPlayerStat.save()
+
+    for teamStat in teamStats:
+        team = Team.objects.get(id=teamStat['team_id'])
+        newTeamStat = TeamStats(team=team, season=season)
+        newTeamStat.save()

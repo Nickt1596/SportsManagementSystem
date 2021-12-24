@@ -1,0 +1,60 @@
+Process Work Flow for Adding a New Season
+
+We need to assume to following
+Hierarchy looks as follows
+
+Season
+    Division - MM to Season
+        Team - FK to Division | MM to Season
+            Player - FK to Team
+                PlayerStats - FK to Player | FK to Season
+            TeamStats - FK to Team | FK to Season
+
+When we add a new Season we do the following
+1. Add the New Season to the Division and Team
+2. Generate new PlayerStats and new TeamStats with FK to the new season
+
+When a Commissioner adds a new season what do they need to be able to do?
+1. Import last seasons Divisions and Teams
+2. Rename Divisions/Remove Divisions
+3. Add new Divisions
+4. Remove/Add new teams
+5. Change what division a team is in
+
+What does a Commisioner need to do during the season?
+1. Schedule Games - Done
+2. Book Ice Slots - Done
+3. Schedule Refs/Scorekeeper - Done
+4. Enter Game Results
+5. Enter Game Stats
+
+What does a Captain need to during the season?
+1. At beginning of season, update the roster with the players for that season
+
+
+Going to add in new Tables to the DB
+Season
+    Division - MM to Season
+        Team - FK to Division | MM to Season
+            Player - FK to Team
+                PlayerStats - FK to Player | FK to Season
+                    Goal - FK to PlayerStats
+                    Penalty - FK to PlayerStats
+            TeamStats - FK to Team | FK to Season
+
+Scorekeeper
+Referee
+Rink
+    IceSlot - FK to Rink
+        Game - FK to Team1 | FK to Team2 | FK to Scorekeeper | MM to Referees
+
+When Entering game results, with the time of the goal and the period and team, we don't need to enter the box score
+
+Game Results
+1. Verify that the roster is correct, input any new players if needed
+    - Display a page with all the players - Check box if they signed in
+    - Additional + button to add a new player who signed in, if they are not on the roster
+    - Do these for each team
+1. Select a game
+2. Enter Goals
+3. Penalties

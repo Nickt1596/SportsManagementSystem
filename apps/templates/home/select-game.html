@@ -1,12 +1,11 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Division Table {% endblock %}
+{% block title %} Game Report Select Game {% endblock title %}
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
-
 	<!-- Page plugins -->
 	<link rel="stylesheet" href="/static/assets/vendor/datatables.net-bs4/css/dataTables.bootstrap4.min.css">
 	<link rel="stylesheet" href="/static/assets/vendor/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css">
@@ -19,10 +18,11 @@
 			<div class="header-body">
 				<div class="row align-items-center py-4">
 					<div class="col-lg-6 col-7">
-						<h6 class="h2 text-white d-inline-block mb-0">League Info</h6>
+						<h6 class="h2 text-white d-inline-block mb-0">Game Report</h6>
 						<nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
 							<ol class="breadcrumb breadcrumb-links breadcrumb-dark">
-								<li class="breadcrumb-item active" aria-current="page">Divisions</li>
+								<li class="breadcrumb-item">Game Report</li>
+								<li class="breadcrumb-item active" aria-current="page">Select Game</li>
 							</ol>
 						</nav>
 					</div>
@@ -44,24 +44,28 @@
 				<div class="card">
 					<!-- Card header -->
 					<div class="card-header">
-						<h3 class="mb-0">Divisions</h3>
+						<h3 class="mb-0">Select Game</h3>
 					</div>
 					<div class="table-responsive py-4">
 						<table class="table table-flush" id="datatable-basic">
 							<thead class="thead-light">
 							<tr>
-								<th>Name</th>
+								<th>Date</th>
+								<th>Home Team</th>
+								<th>Away Team</th>
+								<th>Select</th>
 							</tr>
 							</thead>
-							<tfoot>
-							<tr>
-								<th>Name</th>
-							</tr>
-							</tfoot>
+
 							<tbody>
-							{% for division in divisions %}
+							{% for game in games %}
 								<tr>
-									<td>{{ division.name }}</td>
+									<td>{{ game.iceSlot__date }}</td>
+									<td>{{ game.homeTeam__name }}</td>
+									<td>{{ game.awayTeam__name }}</td>
+									<td>
+										<a href="{% url 'gameReportRoster' game.id %}" class="btn btn-fill btn-primary btm-sm">Select</a>
+									</td>
 								</tr>
 							{% endfor %}
 							</tbody>
@@ -77,7 +81,7 @@
 
 {% endblock content %}
 
-<!-- Specific Page JS goes HERE  -->
+<!-- Specific Page JS goes HERE -->
 {% block javascripts %}
 
 	<!-- Optional JS -->

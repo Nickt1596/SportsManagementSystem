@@ -1,0 +1,262 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Game Report Roster {% endblock title %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+	<!-- Header -->
+	<div class="header bg-primary pb-6">
+		<div class="container-fluid">
+			<div class="header-body">
+				<div class="row align-items-center py-4">
+					<div class="col-lg-6 col-7">
+						<h6 class="h2 text-white d-inline-block mb-0">Game Report</h6>
+						<nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+							<ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+								<li class="breadcrumb-item">Game Report</li>
+								<li class="breadcrumb-item active" aria-current="page">Rosters</li>
+							</ol>
+						</nav>
+					</div>
+					<div class="col-lg-6 col-5 text-right">
+{#						              <a href="#" class="btn btn-sm btn-neutral">New</a>#}
+{#						              <a href="#" class="btn btn-sm btn-neutral">Filters</a>#}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="card">
+		<div class="container-fluid mt--6">
+		<!-- Table -->
+			<div class="row card-wrapper">
+
+				<div class="col-lg-6">
+					<div class="card">
+						<!-- Card header -->
+						<div class="card-header border-0">
+							<div class="row">
+
+								<div class="col-6">
+									<h3 class="mb-0">{{ homeTeam.name }} Roster </h3>
+								</div>
+
+								<div class="col-6 text-right">
+									<a href="#" class="btn btn-sm btn-danger btn-round btn-icon" data-toggle="tooltip"
+									   data-original-title="Edit product">
+										<span class="btn-inner--icon"><i class="fas fa-trash"></i></span>
+										<span class="btn-inner--text">Delete</span>
+									</a>
+								</div>
+
+							</div>
+						</div>
+
+						<!-- Light table -->
+						<div class="table-responsive">
+							<table class="table align-items-center table-flush table-hover">
+
+								<thead class="thead-light">
+								<tr>
+									<th>Played</th>
+									<th>First Name</th>
+									<th>Last Name</th>
+									<th>Jersey Number</th>
+								</tr>
+								</thead>
+
+
+								<tbody>
+
+								{% for player in homeTeamPlayers %}
+									<tr>
+										<td>
+											<div class="custom-control custom-checkbox mb-3">
+												<input class="custom-control-input" id="homeTeamPlayed" type="checkbox">
+												<label class="custom-control-label" for="homeTeamPlayed">Played</label>
+											</div>
+										</td>
+										<td>{{ player.firstName }}</td>
+										<td>{{ player.lastName }}</td>
+										<td>{{ player.jerseyNumber }}</td>
+									</tr>
+								{% endfor %}
+
+								<tr>
+									<td>
+										<div class="custom-control custom-checkbox mb-3">
+											<input class="custom-control-input" id="homeTeamNewPlayed" type="checkbox">
+											<label class="custom-control-label" for="homeTeamNewPlayed">Played</label>
+										</div>
+									</td>
+									<th>
+										<div class="form-group">
+											<label class="form-control-label" for="homeTeamPlayerFirstName"></label>
+											<input type="text" class="form-control" id="homeTeamPlayerFirstName" placeholder="First Name">
+										</div>
+									</th>
+
+									<th>
+										<div class="form-group">
+											<label class="form-control-label" for="homeTeamPlayerLastName"></label>
+											<input type="text" class="form-control" id="homeTeamPlayerLastName" placeholder="Last Name">
+										</div>
+									</th>
+
+									<th>
+										<div class="form-group">
+											<label class="form-control-label" for="homeTeamPlayerNumber"></label>
+											<input type="text" class="form-control" id="homeTeamPlayerNumber" placeholder="Jersey #">
+										</div>
+									</th>
+
+								</tr>
+
+								</tbody>
+							</table>
+						</div>
+
+						<div class="card-footer ">
+							<div class="row">
+
+								<div class="col-6">
+									<button type="button" class="btn btn-primary" id="homeTeamAddAnother">Add Player</button>
+								</div>
+
+
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+
+				<div class="col-lg-6">
+					<div class="card">
+						<!-- Card header -->
+						<div class="card-header border-0">
+							<div class="row">
+
+								<div class="col-6">
+									<h3 class="mb-0">{{ awayTeam.name }} Roster </h3>
+								</div>
+
+								<div class="col-6 text-right">
+									<a href="#" class="btn btn-sm btn-danger btn-round btn-icon" data-toggle="tooltip"
+									   data-original-title="Edit product">
+										<span class="btn-inner--icon"><i class="fas fa-trash"></i></span>
+										<span class="btn-inner--text">Delete</span>
+									</a>
+								</div>
+
+							</div>
+						</div>
+
+						<!-- Light table -->
+						<div class="table-responsive">
+							<table class="table align-items-center table-flush table-hover">
+
+								<thead class="thead-light">
+								<tr>
+									<th>Played</th>
+									<th>First Name</th>
+									<th>Last Name</th>
+									<th>Jersey Number</th>
+								</tr>
+								</thead>
+
+
+								<tbody>
+
+								{% for player in awayTeamPlayers %}
+									<tr>
+										<td>
+											<div class="custom-control custom-checkbox mb-3">
+												<input class="custom-control-input" id="awayTeamPlayed" type="checkbox">
+												<label class="custom-control-label" for="awayTeamPlayed">Played</label>
+											</div>
+										</td>
+										<td>{{ player.firstName }}</td>
+										<td>{{ player.lastName }}</td>
+										<td>{{ player.jerseyNumber }}</td>
+									</tr>
+								{% endfor %}
+
+								<tr>
+									<td>
+										<div class="custom-control custom-checkbox mb-3">
+											<input class="custom-control-input" id="awayTeamNewPlayed" type="checkbox">
+											<label class="custom-control-label" for="awayTeamNewPlayed">Played</label>
+										</div>
+									</td>
+
+									<th>
+										<div class="form-group">
+											<label class="form-control-label" for="awayTeamPlayerFirstName"></label>
+											<input type="text" class="form-control" id="awayTeamPlayerFirstName" placeholder="First Name">
+										</div>
+									</th>
+
+									<th>
+										<div class="form-group">
+											<label class="form-control-label" for="awayTeamPlayerLastName"></label>
+											<input type="text" class="form-control" id="awayTeamPlayerLastName" placeholder="Last Name">
+										</div>
+									</th>
+
+									<th>
+										<div class="form-group">
+											<label class="form-control-label" for="awayTeamPlayerNumber"></label>
+											<input type="text" class="form-control" id="awayTeamPlayerNumber" placeholder="Jersey #">
+										</div>
+									</th>
+
+								</tr>
+
+								</tbody>
+							</table>
+						</div>
+						<div class="card-footer ">
+							<div class="row">
+
+								<div class="col-6">
+									<button type="button" class="btn btn-primary" id="awayTeamAddAnother">Add Player</button>
+								</div>
+
+
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+			</div>
+		</div>
+		<div class="card-body ">
+			<button type="button" class="btn btn-primary" id="submitRosters">Submit Rosters</button>
+		</div>
+	</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE -->
+{% block javascripts %}
+
+{% endblock javascripts %}

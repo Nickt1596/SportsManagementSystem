@@ -51,6 +51,7 @@ def pages(request):
 def divisions(request):
     divisions = Division.objects.all().values()
     context = {'divisions': divisions}
+    return render(request, "home/divisions.html", context)
 
 
 @login_required(login_url="/login/")
@@ -68,16 +69,37 @@ def rinks(request):
 
 
 @login_required(login_url="/login/")
-def addGame(request):
-    form = GameForm()
-    print(form.fields)
+def scorekeepers(request):
+    scorekeepers = Scorekeeper.objects.all().values()
+    context = {'scorekeepers': scorekeepers}
+    return render(request, "home/scorekeepers.html", context)
+
+
+@login_required(login_url="/login/")
+def divisionsAndTeams(request):
+    divisions = Division.objects.all().values()
+    teams = Team.objects.all().values()
+    context = {'divisions': divisions, 'teams': teams}
+    return render(request, "home/divisions-teams.html", context)
+
+
+@login_required(login_url="/login/")
+def addSeason(request):
+    form = SeasonForm()
     if request.method == 'POST':
-        form = GameForm(request.POST)
+        form = SeasonForm(request.POST)
         if form.is_valid():
+            seasonName = form.cleaned_data['name']
+            print(seasonName)
             form.save()
+            if 'seasonImport' in request.POST:
+                season = Season.objects.get(name=seasonName)
+                seasonImport(season)
+                # If season import is checked
+                return redirect('gameManager')
             return redirect('home')
     context = {'form': form}
-    return render(request, "home/game-form.html", context)
+    return render(request, "home/create-new-season.html", context)
 
 
 @login_required(login_url="/login/")
@@ -108,3 +130,47 @@ def gameManager(request):
             return redirect('home')
     context = {'formset': formset}
     return render(request, "home/game-manager.html", context)
+
+
+@login_required(login_url="/login/")
+def selectGame(request):
+    games = Game.objects.all().values(
+        'iceSlot__date',
+        'homeTeam__name',
+        'awayTeam__name',
+        'id'
+    )
+    context = {'games': games}
+    return render(request, "home/select-game.html", context)
+
+
+@login_required(login_url="/login/")
+def gameReportRoster(request, pk):
+    # Need to add in to the Game Form, the season for the game
+    game = Game.objects.get(id=pk)
+    homeTeam = Team.objects.get(id=game.homeTeam_id)
+    awayTeam = Team.objects.get(id=game.awayTeam_id)
+    homeTeamPlayers = Player.objects.filter(team__id=homeTeam.id).all().values()
+    awayTeamPlayers = Player.objects.filter(team__id=awayTeam.id).all().values()
+    print(homeTeam)
+    print(awayTeam)
+    print('Home Team Players')
+    for player in homeTeamPlayers:
+        print(player['firstName'] + " " + player['lastName'])
+    print('Away Team Players')
+    for player2 in awayTeamPlayers:
+        print(player2['firstName'] + " " + player2['lastName'])
+
+    games = Game.objects.all().values(
+        'iceSlot__date',
+        'homeTeam__name',
+        'awayTeam__name',
+        'id'
+    )
+    context = {'games': games,
+               'homeTeam': homeTeam,
+               'awayTeam': awayTeam,
+               'homeTeamPlayers': homeTeamPlayers,
+               'awayTeamPlayers': awayTeamPlayers
+               }
+    return render(request, "home/game-report-roster.html", context)

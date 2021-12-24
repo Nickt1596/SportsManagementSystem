@@ -44,7 +44,7 @@
                       </a>
                     </li>
 	                  <li class="nav-item">
-                      <a href="{% url 'iceSlotManager' %}" class="nav-link">
+                      <a href="{% url 'selectGame' %}" class="nav-link">
                         <span class="sidenav-mini-icon"> G </span>
                         <span class="sidenav-normal"> Enter Game Report </span>
                       </a>
@@ -62,7 +62,7 @@
                       </a>
                     </li>
 	                  <li class="nav-item">
-                      <a href="{% url 'iceSlotManager' %}" class="nav-link">
+                      <a href="{% url 'addSeason' %}" class="nav-link">
                         <span class="sidenav-mini-icon"> NS </span>
                         <span class="sidenav-normal"> Create New Season </span>
                       </a>
@@ -70,7 +70,7 @@
 	                  <li class="nav-item">
                       <a href="{% url 'iceSlotManager' %}" class="nav-link">
                         <span class="sidenav-mini-icon"> MS </span>
-                        <span class="sidenav-normal"> Manage Season </span>
+                        <span class="sidenav-normal"> Manage Seasons </span>
                       </a>
                     </li>
                   </ul>
@@ -429,12 +429,6 @@
                     </a>
                 </li>
             <li class="nav-item">
-                    <a class="nav-link" href="{% url 'addGame' %}" >
-                        <i class="ni ni-user-run text-red"></i>
-                        <span class="nav-link-text">Add Game</span>
-                    </a>
-            </li>
-            <li class="nav-item">
                     <a class="nav-link" href="{% url 'referees' %}" >
                         <i class="ni ni-user-run text-red"></i>
                         <span class="nav-link-text">Referees</span>
@@ -444,6 +438,24 @@
                     <a class="nav-link" href="{% url 'rinks' %}" >
                         <i class="ni ni-user-run text-red"></i>
                         <span class="nav-link-text">Rinks</span>
+                    </a>
+            </li>
+            <li class="nav-item">
+                    <a class="nav-link" href="{% url 'scorekeepers' %}" >
+                        <i class="ni ni-user-run text-red"></i>
+                        <span class="nav-link-text">Scorekeepers</span>
+                    </a>
+            </li>
+            <li class="nav-item">
+                    <a class="nav-link" href="{% url 'divisions' %}" >
+                        <i class="ni ni-user-run text-red"></i>
+                        <span class="nav-link-text">Divisions</span>
+                    </a>
+            </li>
+            <li class="nav-item">
+                    <a class="nav-link" href="{% url 'divisionsAndTeams' %}" >
+                        <i class="ni ni-user-run text-red"></i>
+                        <span class="nav-link-text">Divisions and Teams</span>
                     </a>
             </li>
             </ul>
