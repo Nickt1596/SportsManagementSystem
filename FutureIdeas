@@ -21,7 +21,7 @@ When a Commissioner adds a new season what do they need to be able to do?
 4. Remove/Add new teams
 5. Change what division a team is in
 
-What does a Commisioner need to do during the season?
+What does a Commissioner need to do during the season?
 1. Schedule Games - Done
 2. Book Ice Slots - Done
 3. Schedule Refs/Scorekeeper - Done
@@ -33,13 +33,14 @@ What does a Captain need to during the season?
 
 
 Going to add in new Tables to the DB
+
 Season
     Division - MM to Season
         Team - FK to Division | MM to Season
             Player - FK to Team
                 PlayerStats - FK to Player | FK to Season
-                    Goal - FK to PlayerStats
-                    Penalty - FK to PlayerStats
+                    Goal - FK to PlayerStats | FK to Game
+                    Penalty - FK to PlayerStats | FK to Game
             TeamStats - FK to Team | FK to Season
 
 Scorekeeper
@@ -47,14 +48,45 @@ Referee
 Rink
     IceSlot - FK to Rink
         Game - FK to Team1 | FK to Team2 | FK to Scorekeeper | MM to Referees
+            GameResult - FK to Game | FK to Team1 | FK to Team2
 
 When Entering game results, with the time of the goal and the period and team, we don't need to enter the box score
 
-Game Results
-1. Verify that the roster is correct, input any new players if needed
-    - Display a page with all the players - Check box if they signed in
-    - Additional + button to add a new player who signed in, if they are not on the roster
-    - Do these for each team
-1. Select a game
-2. Enter Goals
-3. Penalties
+Enter Game Report Functionality
+- Split into 3 different pages
+1. Select a game to enter results for (selectGame)
+    - Using HREF the user selects a game, and that game id is sent to view number 2.
+2. Mark what players signed in, and add any new players if needed (gameReportRoster)
+    - Using the game.id we run the following queries
+        a. Get Home Team
+        b. Get Away Team
+        c. Get all Home Team Players
+        d. Get all Away Team Players
+        e. Generate Home Team Formset
+        f. Generate Away Team Formset
+    - We then add these to context and generate out template
+    - Our Template loads a table for each team to mark off checked in players as well as 2 forms to add new players
+
+    - Our post request gathers the following data
+        a. List of all HomePlayers who Played
+        b. List of all AwayPlayers who Played
+        c. Formset data of all HomePlayers who Played
+        d. Formset data of all AwayPlayers who Played
+    - To process the data of the formsets
+        - We loop through each formset, verifying it is valid and creating a new player object for each added player
+
+    This completes what step 2 does
+
+    At this point, our tempResults will hold the following
+        1. Game
+        2. HomePlayersPlayed
+        3. AwayPlayersPlayed
+
+
+3. Add Goals and Penalties for the game
+
+
+Entering Game Results, requires the following workflow
+
+1. User Selects a game to enter the score for
+    - That game.id is needed

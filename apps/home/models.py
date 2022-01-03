@@ -32,6 +32,8 @@ class Season(models.Model):
     name = models.CharField(max_length=50)
     numGames = models.CharField(max_length=3)
     currentSeason = models.BooleanField(default=False)
+    date_modified = models.DateTimeField(auto_now=True)
+    date_created = models.DateTimeField(auto_now_add=True)
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
 
     def __str__(self):
@@ -41,7 +43,9 @@ class Season(models.Model):
 # A division can belong to many seasons
 class Division(models.Model):
     name = models.CharField(max_length=50)
-    seasons = models.ManyToManyField(Season, blank=True, null=True)
+    seasons = models.ManyToManyField(Season, blank=True)
+    date_modified = models.DateTimeField(auto_now=True)
+    date_created = models.DateTimeField(auto_now_add=True)
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
 
     def __str__(self):
@@ -51,8 +55,10 @@ class Division(models.Model):
 # A team can belong to many seasons
 class Team(models.Model):
     name = models.CharField(max_length=80)
-    division = models.ForeignKey(Division, on_delete=models.CASCADE, blank=True, null=True)
-    seasons = models.ManyToManyField(Season, blank=True, null=True)
+    division = models.ForeignKey(Division, blank=True, null=True, on_delete=models.CASCADE)
+    seasons = models.ManyToManyField(Season, blank=True)
+    date_modified = models.DateTimeField(auto_now=True)
+    date_created = models.DateTimeField(auto_now_add=True)
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
 
     def __str__(self):
@@ -70,12 +76,15 @@ class Team(models.Model):
 
 
 class TeamStats(models.Model):
-    team = models.ForeignKey(Team, on_delete=models.CASCADE, blank=True, null=True)
+    team = models.ForeignKey(Team, blank=True, null=True, on_delete=models.CASCADE)
     regWins = models.IntegerField(default=0)
     regLoses = models.IntegerField(default=0)
     otWins = models.IntegerField(default=0)
     otLoses = models.IntegerField(default=0)
-    season = models.ForeignKey(Season, on_delete=models.CASCADE, blank=True, null=True)
+    ties = models.IntegerField(default=0)
+    season = models.ForeignKey(Season, blank=True, null=True, on_delete=models.CASCADE)
+    date_modified = models.DateTimeField(auto_now=True)
+    date_created = models.DateTimeField(auto_now_add=True)
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
 
     def __str__(self):
@@ -85,23 +94,33 @@ class TeamStats(models.Model):
 class Player(models.Model):
     firstName = models.CharField(max_length=80)
     lastName = models.CharField(max_length=80)
-    jerseyNumber = models.IntegerField(default=0)
-    position = models.CharField(max_length=80)
+    jerseyNumber = models.CharField(max_length=3)
+    # jerseyNumber = models.IntegerField(default=0)
+    position = models.CharField(max_length=80, blank=True, null=True)
     captain = models.BooleanField(default=False)
     altCaptain = models.BooleanField(default=False)
-    team = models.ForeignKey(Team, on_delete=models.CASCADE, blank=True, null=True)
+    team = models.ForeignKey(Team, blank=True, null=True, on_delete=models.CASCADE)
+    date_modified = models.DateTimeField(auto_now=True)
+    date_created = models.DateTimeField(auto_now_add=True)
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
 
     def __str__(self):
-        return self.firstName + ' ' + self.lastName
+        return '#' + self.jerseyNumber + ' ' + self.firstName + '. ' + self.lastName
+
+        # return '#' + self.jerseyNumber + ' ' + self.firstName[0] + '. ' + self.lastName
 
     def save(self, *args, **kwargs):
         created = self._state.adding is True
         if created:
-            super().save(*args, **kwargs)
-            player = Player.objects.get(id=self.id)
-            playerStats = PlayerStats(player=player, team=self.team)
-            playerStats.save()
+            if len(self.firstName) != 0 and len(self.lastName) != 0 and len(
+                    self.jerseyNumber) != 0 and self.team is not None:
+                print('Valid Player Object')
+                super().save(*args, **kwargs)
+                player = Player.objects.get(id=self.id)
+                playerStats = PlayerStats(player=player)
+                playerStats.save()
+            else:
+                print('Invalid Player Object')
         else:
             super().save(*args, **kwargs)
 
@@ -111,8 +130,10 @@ class PlayerStats(models.Model):
     assists = models.IntegerField(default=0)
     gamesPlayed = models.IntegerField(default=0)
     playoffEligible = models.BooleanField(default=False)
-    player = models.ForeignKey(Player, on_delete=models.CASCADE, blank=True, null=True)
-    season = models.ForeignKey(Season, on_delete=models.CASCADE, blank=True, null=True)
+    player = models.ForeignKey(Player, blank=True, null=True, on_delete=models.CASCADE)
+    season = models.ForeignKey(Season, blank=True, null=True, on_delete=models.CASCADE)
+    date_modified = models.DateTimeField(auto_now=True)
+    date_created = models.DateTimeField(auto_now_add=True)
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
 
     def __str__(self):
@@ -123,6 +144,8 @@ class Scorekeeper(models.Model):
     name = models.CharField(max_length=80)
     phoneNumber = models.CharField(max_length=80)
     email = models.CharField(max_length=80)
+    date_modified = models.DateTimeField(auto_now=True)
+    date_created = models.DateTimeField(auto_now_add=True)
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
 
     def __str__(self):
@@ -133,6 +156,8 @@ class Referee(models.Model):
     name = models.CharField(max_length=80)
     phoneNumber = models.CharField(max_length=80)
     email = models.CharField(max_length=80)
+    date_modified = models.DateTimeField(auto_now=True)
+    date_created = models.DateTimeField(auto_now_add=True)
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
 
     def __str__(self):
@@ -146,6 +171,8 @@ class Rink(models.Model):
     state = models.CharField(max_length=80)
     zip = models.CharField(max_length=80)
     phoneNumber = models.CharField(max_length=80)
+    date_modified = models.DateTimeField(auto_now=True)
+    date_created = models.DateTimeField(auto_now_add=True)
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
 
     def __str__(self):
@@ -155,10 +182,12 @@ class Rink(models.Model):
 # When Deleting an Ice Slot, we need to check if a game currently has that Ice Slot assigned
 # If it does, we change the Game Ice Slot back to null
 class IceSlot(models.Model):
-    rink = models.ForeignKey(Rink, on_delete=models.CASCADE, null=True, blank=True)
+    rink = models.ForeignKey(Rink, blank=True, null=True, on_delete=models.CASCADE)
     date = models.DateField(null=True, blank=True)
     time = models.TimeField(null=True, blank=True)
     available = models.BooleanField(default=True)
+    date_modified = models.DateTimeField(auto_now=True)
+    date_created = models.DateTimeField(auto_now_add=True)
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
 
     def __str__(self):
@@ -173,7 +202,9 @@ class Game(models.Model):
     iceSlot = models.ForeignKey(IceSlot, on_delete=models.CASCADE, blank=True, null=True,
                                 limit_choices_to={'available': True})
     scorekeeper = models.ForeignKey(Scorekeeper, on_delete=models.CASCADE, blank=True, null=True)
-    referees = models.ManyToManyField(Referee, blank=True, null=True)
+    referees = models.ManyToManyField(Referee, blank=True)
+    date_modified = models.DateTimeField(auto_now=True)
+    date_created = models.DateTimeField(auto_now_add=True)
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
 
     def __str__(self):
@@ -184,6 +215,135 @@ class Game(models.Model):
         iceSlot = IceSlot.objects.get(id=self.iceSlot.id)
         iceSlot.available = False
         iceSlot.save()
+
+
+class Goal(models.Model):
+    PERIODS = [
+        ('1', '1'),
+        ('2', '2'),
+        ('3', '3'),
+        ('OT', 'OT')
+    ]
+
+    goalScorer = models.ForeignKey(PlayerStats, on_delete=models.CASCADE, blank=True, null=True,
+                                   related_name='Goal_Scorer')
+    assistPrimary = models.ForeignKey(PlayerStats, on_delete=models.CASCADE, blank=True, null=True,
+                                      related_name='Primary_Assist')
+    assistSecondary = models.ForeignKey(PlayerStats, on_delete=models.CASCADE, blank=True, null=True,
+                                        related_name='Secondary_Assist')
+    period = models.CharField(max_length=100, choices=PERIODS)
+    timeScored = models.CharField(max_length=80)
+    date_modified = models.DateTimeField(auto_now=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    game = models.OneToOneField(Game, on_delete=models.CASCADE)
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+
+
+class Penalty(models.Model):
+    PERIODS = [
+        ('1', '1'),
+        ('2', '2'),
+        ('3', '3'),
+        ('OT', 'OT')
+    ]
+    PENALTY_SEVERITY = [
+        ('Minor', 'Minor'),
+        ('Double Minor', 'Double Minor'),
+        ('Major', 'Major'),
+        ('Game Misconduct', 'Game Misconduct'),
+        ('Match', 'Match')
+    ]
+    PENALTY_LENGTH = [
+        ('2', '2'),
+        ('4', '4'),
+        ('5', '5'),
+        ('10', '10')
+    ]
+    PENALTIES = [
+        ('Charging', 'Charging'),
+        ('Cross-checking', 'Cross-checking'),
+        ('Delay of game', 'Delay of game'),
+        ('Elbowing', 'Elbowing'),
+        ('Embellishment', 'Embellishment'),
+        ('Goaltender interference', 'Goaltender interference'),
+        ('High-sticking', 'High-sticking'),
+        ('Hooking', 'Hooking'),
+        ('Interference', 'Interference'),
+        ('Roughing', 'Roughing'),
+        ('Slashing', 'Slashing'),
+        ('Tripping', 'Tripping'),
+        ('Unsportsmanlike conduct', 'Unsportsmanlike conduct'),
+        ('Too many men on the ice', 'Too many men on the ice'),
+        ('Boarding', 'Boarding'),
+        ('Fighting', 'Fighting'),
+    ]
+
+    period = models.CharField(max_length=100, choices=PERIODS)
+    severity = models.CharField(max_length=100, choices=PENALTY_SEVERITY)
+    length = models.CharField(max_length=100, choices=PENALTY_LENGTH)
+    type = models.CharField(max_length=100, choices=PENALTIES)
+    timeCommitted = models.CharField(max_length=80)
+    player = models.ForeignKey(PlayerStats, blank=True, null=True, on_delete=models.CASCADE)
+    date_modified = models.DateTimeField(auto_now=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    game = models.OneToOneField(Game, on_delete=models.CASCADE)
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+
+
+class GameResult(models.Model):
+    WIN_TYPES = [
+        ('Regulation', 'REG'),
+        ('Overtime', 'OT'),
+        ('Shootout', 'SO'),
+        ('Tie', 'TIE'),
+    ]
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, blank=True, null=True, )
+    winningTeam = models.ForeignKey(Team, on_delete=models.CASCADE, blank=True, null=True, related_name='Winning_Team')
+    losingTeam = models.ForeignKey(Team, on_delete=models.CASCADE, blank=True, null=True, related_name='Losing_Team')
+    winType = models.CharField(max_length=100, choices=WIN_TYPES)
+    winnerScore = models.IntegerField(default=0)
+    loserScore = models.IntegerField(default=0)
+    date_modified = models.DateTimeField(auto_now=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+
+    def __str__(self):
+        return self.game.homeTeam.name + ' vs ' + self.game.awayTeam.name + ' Result'
+
+
+class TempGameResults(models.Model):
+    WIN_TYPES = [
+        ('Regulation', 'REG'),
+        ('Overtime', 'OT'),
+        ('Shootout', 'SO'),
+        ('Tie', 'TIE'),
+    ]
+    # Will Hold from Step 1 our select game
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, blank=True, null=True)
+    # Will hold our Temp Players who played from both teams
+    homePlayers = models.ManyToManyField(Player, blank=True, related_name='Home_Players_Temp')
+    awayPlayers = models.ManyToManyField(Player, blank=True, related_name='Away_Players_Temp')
+    winningTeam = models.ForeignKey(Team, on_delete=models.CASCADE, blank=True, null=True,
+                                    related_name='Winning_Team_Temp')
+    losingTeam = models.ForeignKey(Team, on_delete=models.CASCADE, blank=True, null=True,
+                                   related_name='Losing_Team_Temp')
+    tempGoals = models.ManyToManyField(Goal, blank=True, related_name='Goals_Temp')
+    tempPenalties = models.ManyToManyField(Penalty, blank=True, related_name='Penalties_Temp')
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+
+    def __str__(self):
+        return self.game.homeTeam.name + ' vs ' + self.game.awayTeam.name + ' Temp Result'
+
+    # def save(self, *args, **kwargs):
+    #     created = self._state.adding is True
+    #     super().save(*args, **kwargs)
+    #     if created:
+    #         super().save(*args, **kwargs)
+    # homePlayers = Player.objects.filter(team__id=self.game.homeTeam.id)
+    # awayTeamPlayers = Player.objects.filter(team__id=self.game.awayTeam.id)
+    # self.homePlayers.set(homePlayers)
+    # self.awayPlayers.set(awayTeamPlayers)
+    # super().save(*args, **kwargs)
 
 
 def loadDivisions():

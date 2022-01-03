@@ -1,0 +1,468 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Game Report Stats {% endblock title %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+	<!-- Header -->
+	<!-- All of this contains the breadcrumb up top -->
+	<div class="header bg-primary pb-6">
+		<div class="container-fluid">
+			<div class="header-body">
+				<div class="row align-items-center py-4">
+					<div class="col-lg-6 col-7">
+						<h6 class="h2 text-white d-inline-block mb-0">Game Report</h6>
+						<nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+							<ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+								<li class="breadcrumb-item">Game Report</li>
+								<li class="breadcrumb-item active" aria-current="page">Stats</li>
+							</ol>
+						</nav>
+					</div>
+					<div class="col-lg-6 col-5 text-right">
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Main Card for the entire page -->
+	<form id="submitAll" method="POST">
+		{% csrf_token %}
+		<div class="card">
+			<!-- Container Class -->
+			<div class="container-fluid mt--6">
+
+				<!-- Roster Table -->
+				<!-- This is our card on the bottom now for adding Players -->
+				<div class="row card-wrapper ">
+					<form></form>
+
+{#					<div class="col-auto">#}
+					<div class="col-lg-6">
+						<!-- Card for our left side Table for the Home Team -->
+						<div class="card">
+
+							<!-- Add Player header -->
+							<div class="card-header border-0">
+								<div class="row">
+
+									<div class="col-auto">
+										<h3 class="mb-0">{{ homeTeam.name }} Goals</h3>
+									</div>
+								</div>
+							</div>
+
+							<!-- Add Player Form Starts here -->
+							<div id="form-container-goalFormHome" class="card-body">
+{#							{% csrf_token %}#}
+								{{ formsetGoalHome.management_form }}
+								{% for form in formsetGoalHome %}
+									<div class="form-row align-items-center" id="goalFormHome">
+										<div class="col-md">
+											<div class="form-group">
+												<label class="form-control-label">{{ form.goalScorer.label }}</label>
+												{{ form.goalScorer }}
+											</div>
+										</div>
+										<div class="col-md">
+											<div class="form-group">
+												<label class="form-control-label">{{ form.assistPrimary.label }}</label>
+												{{ form.assistPrimary }}
+											</div>
+										</div>
+										<div class="col-md">
+											<div class="form-group">
+												<label class="form-control-label">{{ form.assistSecondary.label }}</label>
+												{{ form.assistSecondary }}
+											</div>
+										</div>
+										<div class="col-md">
+											<div class="form-group">
+												<label class="form-control-label">{{ form.period.label }}</label>
+												{{ form.period }}
+											</div>
+										</div>
+										<div class="col-md">
+											<div class="form-group">
+												<label class="form-control-label">{{ form.timeScored.label}}</label>
+												{{ form.timeScored }}
+											</div>
+										</div>
+									</div>
+								<button type="button" class="btn btn-primary" id="goalAddAnotherHome">+</button>
+									{% endfor %}
+							</div>
+						</div>
+					</div>
+
+{#				<div class="col-auto">#}
+				<div class="col-lg-6">
+						<!-- Card for our left side Table for the Home Team -->
+						<div class="card">
+
+							<!-- Add Player header -->
+							<div class="card-header border-0">
+								<div class="row">
+
+									<div class="col-auto">
+										<h3 class="mb-0">{{ awayTeam.name }} Goals</h3>
+									</div>
+								</div>
+							</div>
+
+							<!-- Add Player Form Starts here -->
+							<div id="form-container-goalFormAway" class="card-body">
+{#							{% csrf_token %}#}
+								{{ formsetGoalAway.management_form }}
+								{% for form in formsetGoalAway %}
+									<div class="form-row align-items-center" id="goalFormAway">
+										<div class="col-md">
+											<div class="form-group">
+												<label class="form-control-label">{{ form.goalScorer.label }}</label>
+												{{ form.goalScorer }}
+											</div>
+										</div>
+										<div class="col-md">
+											<div class="form-group">
+												<label class="form-control-label">{{ form.assistPrimary.label }}</label>
+												{{ form.assistPrimary }}
+											</div>
+										</div>
+										<div class="col-md">
+											<div class="form-group">
+												<label class="form-control-label">{{ form.assistSecondary.label }}</label>
+												{{ form.assistSecondary }}
+											</div>
+										</div>
+										<div class="col-md">
+											<div class="form-group">
+												<label class="form-control-label">{{ form.period.label }}</label>
+												{{ form.period }}
+											</div>
+										</div>
+										<div class="col-md">
+											<div class="form-group">
+												<label class="form-control-label">{{ form.timeScored.label}}</label>
+												{{ form.timeScored }}
+											</div>
+										</div>
+									</div>
+								<button type="button" class="btn btn-primary" id="goalAddAnotherAway">+</button>
+									{% endfor %}
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+				<div class="row card-wrapper justify-content-md-center">
+					<div class="col-lg-6">
+						<!-- Card for our left side Table for the Home Team -->
+						<div class="card">
+
+							<!-- Add Player header -->
+							<div class="card-header border-0">
+								<div class="row">
+
+									<div class="col-auto">
+										<h3 class="mb-0">{{ homeTeam.name }} Penalties</h3>
+									</div>
+								</div>
+							</div>
+
+							<!-- Add Player Form Starts here -->
+							<div id="form-container-penaltyFormHome" class="card-body">
+								{{ formsetPenaltyHome.management_form }}
+								{% for form in formsetPenaltyHome %}
+									<div class="form-row align-items-center" id="penaltyFormHome">
+										<div class="col-md">
+											<div class="form-group">
+												<label class="form-control-label">{{ form.player.label }}</label>
+												{{ form.player }}
+											</div>
+										</div>
+										<div class="col-md">
+											<div class="form-group">
+												<label class="form-control-label">{{ form.period.label }}</label>
+												{{ form.period }}
+											</div>
+										</div>
+										<div class="col-md">
+											<div class="form-group">
+												<label class="form-control-label">{{ form.severity.label }}</label>
+												{{ form.severity }}
+											</div>
+										</div>
+										<div class="col-md">
+											<div class="form-group">
+												<label class="form-control-label">{{ form.length.label }}</label>
+												{{ form.length }}
+											</div>
+										</div>
+										<div class="col-md">
+											<div class="form-group">
+												<label class="form-control-label">{{ form.type.label }}</label>
+												{{ form.type }}
+											</div>
+										</div>
+										<div class="col-md">
+											<div class="form-group">
+												<label class="form-control-label">{{ form.timeCommitted.label }}</label>
+												{{ form.timeCommitted }}
+											</div>
+										</div>
+									</div>
+									<button type="button" class="btn btn-primary" id="penaltyAddAnotherHome">+</button>
+								{% endfor %}
+							</div>
+						</div>
+					</div>
+
+				<div class="col-lg-6">
+						<!-- Card for our left side Table for the Home Team -->
+						<div class="card">
+
+							<!-- Add Player header -->
+							<div class="card-header border-0">
+								<div class="row">
+
+									<div class="col-auto">
+										<h3 class="mb-0">{{ awayTeam.name }} Penalties</h3>
+									</div>
+								</div>
+							</div>
+
+							<!-- Add Player Form Starts here -->
+							<div id="form-container-penaltyFormAway" class="card-body">
+								{{ formsetPenaltyAway.management_form }}
+								{% for form in formsetPenaltyAway %}
+									<div class="form-row align-items-center" id="penaltyFormAway">
+										<div class="col-md">
+											<div class="form-group">
+												<label class="form-control-label">{{ form.player.label }}</label>
+												{{ form.player }}
+											</div>
+										</div>
+										<div class="col-md">
+											<div class="form-group">
+												<label class="form-control-label">{{ form.period.label }}</label>
+												{{ form.period }}
+											</div>
+										</div>
+										<div class="col-md">
+											<div class="form-group">
+												<label class="form-control-label">{{ form.severity.label }}</label>
+												{{ form.severity }}
+											</div>
+										</div>
+										<div class="col-md">
+											<div class="form-group">
+												<label class="form-control-label">{{ form.length.label }}</label>
+												{{ form.length }}
+											</div>
+										</div>
+										<div class="col-md">
+											<div class="form-group">
+												<label class="form-control-label">{{ form.type.label }}</label>
+												{{ form.type }}
+											</div>
+										</div>
+										<div class="col-md">
+											<div class="form-group">
+												<label class="form-control-label">{{ form.timeCommitted.label }}</label>
+												{{ form.timeCommitted }}
+											</div>
+										</div>
+									</div>
+									<button type="button" class="btn btn-primary" id="penaltyAddAnotherAway">+</button>
+								{% endfor %}
+							</div>
+						</div>
+					</div>
+
+
+				</div>
+
+			<div class="row card-wrapper justify-content-md-center">
+					<div class="col-auto">
+						<!-- Card for our left side Table for the Home Team -->
+						<div class="card">
+
+							<!-- Add Player header -->
+							<div class="card-header border-0">
+								<div class="row">
+
+									<div class="col-auto">
+										<h3 class="mb-0">Game Results</h3>
+									</div>
+								</div>
+							</div>
+
+							<!-- Add Player Form Starts here -->
+							<div id="form-container-gameResultForm" class="card-body">
+									<div class="form-row align-items-center" id="gameResultForm">
+										<div class="col-auto">
+											<div class="form-group">
+												<label class="form-control-label">{{ gameResultForm.winningTeam.label }}</label>
+												{{ gameResultForm.winningTeam }}
+											</div>
+										</div>
+										<div class="col-auto">
+											<div class="form-group">
+												<label class="form-control-label">{{ gameResultForm.losingTeam.label }}</label>
+												{{ gameResultForm.losingTeam }}
+											</div>
+										</div>
+										<div class="col-auto">
+											<div class="form-group">
+												<label class="form-control-label">{{ gameResultForm.winType.label }}</label>
+												{{ gameResultForm.winType }}
+											</div>
+										</div>
+										<div class="col-auto">
+											<div class="form-group">
+												<label class="form-control-label">{{ gameResultForm.winnerScore.label }}</label>
+												{{ gameResultForm.winnerScore }}
+											</div>
+										</div>
+										<div class="col-auto">
+											<div class="form-group">
+												<label class="form-control-label">{{ gameResultForm.loserScore.label }}</label>
+												{{ gameResultForm.loserScore }}
+											</div>
+										</div>
+									</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Adding submit button here -->
+				<div class="row card-wrapper">
+
+					<!-- Creates our Column of size 6 -->
+					<div class="col">
+						<!-- Card for our left side Table for the Home Team -->
+						<div class="card-lg-6">
+
+							<!-- Add Player header -->
+							<div class="card-header border-0">
+								<div class="row">
+
+									<div class="col-auto">
+										<h3 class="mb-0">Submit </h3>
+									</div>
+								</div>
+							</div>
+
+							<!-- Add Player Form Starts here -->
+							<div class="card-body">
+								<button type="submit" name="submitStats" class="btn btn-primary btn-simple">Submit</button>
+
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+			</div>
+
+		</div>
+	</form>
+
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE -->
+{% block javascripts %}
+	<script>
+      let goalFormHome = document.querySelectorAll("#goalFormHome")
+      let goalContainerHome = document.querySelector("#form-container-goalFormHome")
+      let goalAddMoreBtnHome = document.querySelector("#goalAddAnotherHome")
+      let goalTotalFormsHome = document.querySelector("#id_goalHome-TOTAL_FORMS")
+      {#let submitButton = document.querySelector("#submitButton")#}
+
+      let goalFormNumHome = goalFormHome.length - 1
+      goalAddMoreBtnHome.addEventListener('click', add_new_form)
+
+      function add_new_form(event) {
+          event.preventDefault()
+          let newForm = goalFormHome[0].cloneNode(true)
+          let formRegex = RegExp(`goalHome-(\\d){1}-`, 'g')
+          goalFormNumHome++
+
+          newForm.innerHTML = newForm.innerHTML.replace(formRegex, `goalHome-${goalFormNumHome}-`)
+          goalContainerHome.insertBefore(newForm, goalAddMoreBtnHome)
+          goalTotalFormsHome.setAttribute('value', `${goalFormNumHome + 1}`)
+      }
+	</script>
+
+	<script>
+      let goalFormAway = document.querySelectorAll("#goalFormAway")
+      let goalContainerAway = document.querySelector("#form-container-goalFormAway")
+      let goalAddMoreBtnAway = document.querySelector("#goalAddAnotherAway")
+      let goalTotalFormsAway = document.querySelector("#id_goalAway-TOTAL_FORMS")
+      {#let submitButton = document.querySelector("#submitButton")#}
+
+      let goalFormNumAway = goalFormAway.length - 1
+      goalAddMoreBtnAway.addEventListener('click', add_new_form)
+
+      function add_new_form(event) {
+          event.preventDefault()
+          let newForm = goalFormAway[0].cloneNode(true)
+          let formRegex = RegExp(`goalAway-(\\d){1}-`, 'g')
+          goalFormNumAway++
+
+          newForm.innerHTML = newForm.innerHTML.replace(formRegex, `goalHome-${goalFormNumAway}-`)
+          goalContainerAway.insertBefore(newForm, goalAddMoreBtnAway)
+          goalTotalFormsAway.setAttribute('value', `${goalFormNumAway + 1}`)
+      }
+	</script>
+
+	<script>
+      let penaltyFormHome = document.querySelectorAll("#penaltyFormHome")
+      let penaltyContainerHome = document.querySelector("#form-container-penaltyFormHome")
+      let penaltyAddMoreBtnHome = document.querySelector("#penaltyAddAnotherHome")
+      let penaltyTotalFormsHome = document.querySelector("#id_penaltyHome-TOTAL_FORMS")
+      {#let submitButton = document.querySelector("#submitButton")#}
+
+      let penaltyFormNumHome = penaltyFormHome.length - 1
+      penaltyAddMoreBtnHome.addEventListener('click', add_new_form)
+
+      function add_new_form(event) {
+          event.preventDefault()
+          let newForm = penaltyFormHome[0].cloneNode(true)
+          let formRegex = RegExp(`penaltyHome-(\\d){1}-`, 'g')
+          penaltyFormNumHome++
+
+          newForm.innerHTML = newForm.innerHTML.replace(formRegex, `penaltyHome-${penaltyFormNumHome}-`)
+          penaltyContainerHome.insertBefore(newForm, penaltyAddMoreBtnHome)
+          penaltyTotalFormsHome.setAttribute('value', `${penaltyFormNumHome + 1}`)
+      }
+	</script>
+
+	<script>
+      let penaltyFormAway = document.querySelectorAll("#penaltyFormAway")
+      let penaltyContainerAway = document.querySelector("#form-container-penaltyFormAway")
+      let penaltyAddMoreBtnAway = document.querySelector("#penaltyAddAnotherAway")
+      let penaltyTotalFormsAway = document.querySelector("#id_penaltyAway-TOTAL_FORMS")
+      {#let submitButton = document.querySelector("#submitButton")#}
+
+      let penaltyFormNumAway = penaltyFormAway.length - 1
+      penaltyAddMoreBtnAway.addEventListener('click', add_new_form)
+
+      function add_new_form(event) {
+          event.preventDefault()
+          let newForm = penaltyFormAway[0].cloneNode(true)
+          let formRegex = RegExp(`penaltyAway-(\\d){1}-`, 'g')
+          penaltyFormNumAway++
+
+          newForm.innerHTML = newForm.innerHTML.replace(formRegex, `penaltyAway-${penaltyFormNumAway}-`)
+          penaltyContainerAway.insertBefore(newForm, penaltyAddMoreBtnAway)
+          penaltyTotalFormsAway.setAttribute('value', `${penaltyFormNumAway + 1}`)
+      }
+	</script>
+{% endblock javascripts %}

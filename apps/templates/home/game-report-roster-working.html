@@ -22,6 +22,8 @@
 						</nav>
 					</div>
 					<div class="col-lg-6 col-5 text-right">
+						{#						              <a href="#" class="btn btn-sm btn-neutral">New</a>#}
+						{#						              <a href="#" class="btn btn-sm btn-neutral">Filters</a>#}
 					</div>
 				</div>
 			</div>
@@ -29,32 +31,33 @@
 	</div>
 
 	<!-- Main Card for the entire page -->
-	<form id="submitAll" method="POST">
-		{% csrf_token %}
-		<div class="card">
-			<!-- Container Class -->
-			<div class="container-fluid mt--6">
+	<div class="card">
+		<!-- Container Class -->
+		<div class="container-fluid mt--6">
 
-				<!-- Roster Table -->
-				<div class="row card-wrapper">
 
-					<!-- Creates our Column of size 6 -->
-					<div class="col-lg-6">
-						<!-- Card for our left side Table for the Home Team -->
-						<div class="card">
+			<!-- Roster Table -->
+			<div class="row card-wrapper">
 
-							<!-- Card header -->
-							<div class="card-header border-0">
-								<div class="row">
+				<!-- Creates our Column of size 6 -->
+				<div class="col-lg-6">
+					<!-- Card for our left side Table for the Home Team -->
+					<div class="card">
 
-									<div class="col-6">
-										<h3 class="mb-0">{{ homeTeam.name }} Roster </h3>
-									</div>
+						<!-- Card header -->
+						<div class="card-header border-0">
+							<div class="row">
 
+								<div class="col-6">
+									<h3 class="mb-0">{{ homeTeam.name }} Roster </h3>
 								</div>
+
 							</div>
+						</div>
 
 
+						<form id="homeTeamChecked" method="POST">
+							{% csrf_token %}
 							<div class="table-responsive">
 								<table class="table align-items-center table-flush table-hover">
 
@@ -86,26 +89,28 @@
 									{% endfor %}
 
 									</tbody>
+									<button type="submit" name="homeTeamSubmit" class="btn btn-primary btn-simple">Submit</button>
 								</table>
 							</div>
-						</div>
+						</form>
 					</div>
-					<!-- Testing putting Away Card Back -->
-					<div class="col-lg-6">
-						<div class="card">
-							<!-- Card header -->
-							<div class="card-header border-0">
-								<div class="row">
+				</div>
+				<!-- Testing putting Away Card Back -->
+				<div class="col-lg-6">
+					<div class="card">
+						<!-- Card header -->
+						<div class="card-header border-0">
+							<div class="row">
 
-									<div class="col-6">
-										<h3 class="mb-0">{{ awayTeam.name }} Roster </h3>
-									</div>
-
+								<div class="col-6">
+									<h3 class="mb-0">{{ awayTeam.name }} Roster </h3>
 								</div>
-							</div>
 
-							{#						<form id="awayTeamChecked" method="POST">#}
-							{#							{% csrf_token %}#}
+							</div>
+						</div>
+
+						<form id="awayTeamChecked" method="POST">
+							{% csrf_token %}
 							<div class="table-responsive">
 								<table class="table align-items-center table-flush table-hover">
 
@@ -136,38 +141,43 @@
 
 
 									</tbody>
+									<button type="submit" name="awayTeamSubmit" class="btn btn-primary btn-simple">Submit</button>
 								</table>
 							</div>
-						</div>
+						</form>
 					</div>
-					<!-- End of Testing putting Away Card Back -->
-
 				</div>
+				<!-- End of Testing putting Away Card Back -->
+
+			</div>
 
 
-				<!-- This is our card on the bottom now for adding Players -->
-				<div class="row card-wrapper">
-					<form></form>
-					<!-- Creates our Column of size 6 -->
-					<div class="col-lg-6">
-						<!-- Card for our left side Table for the Home Team -->
-						<div class="card">
+			<!-- This is our card on the bottom now for adding Players -->
+			<div class="row card-wrapper">
 
-							<!-- Add Player header -->
-							<div class="card-header border-0">
-								<div class="row">
+				<!-- Creates our Column of size 6 -->
+				<div class="col-lg-6">
+					<!-- Card for our left side Table for the Home Team -->
+					<div class="card">
 
-									<div class="col-auto">
-										<h3 class="mb-0">{{ homeTeam.name }} Add Player </h3>
-									</div>
+						<!-- Add Player header -->
+						<div class="card-header border-0">
+							<div class="row">
+
+								<div class="col-auto">
+									<h3 class="mb-0">{{ homeTeam.name }} Add Player </h3>
 								</div>
 							</div>
+						</div>
 
-							<!-- Add Player Form Starts here -->
-							<div id="form-container-homeTeam" class="card-body">
+						<!-- Add Player Form Starts here -->
+						<div class="card-body">
+							<form id="form-container-homeTeam" method="POST">
+								{% csrf_token %}
 								{{ formsetHomeTeam.management_form }}
 								{% for form in formsetHomeTeam %}
 									<div class="form-row align-items-center" id="homeTeamForm">
+										{#									<div class="form-row align-items-center" id="homeTeamForm">#}
 										<div class="col-auto">
 											<div class="form-group">
 												<label class="form-control-label"></label>
@@ -189,27 +199,30 @@
 									</div>
 									<button type="button" class="btn btn-primary" id="homeAddAnother">+</button>
 								{% endfor %}
-							</div>
+							</form>
 						</div>
 					</div>
+				</div>
 
-					<!-- Creates our Column of size 6 -->
-					<div class="col-lg-6">
-						<!-- Card for our left side Table for the Home Team -->
-						<div class="card">
+				<!-- Creates our Column of size 6 -->
+				<div class="col-lg-6">
+					<!-- Card for our left side Table for the Home Team -->
+					<div class="card">
 
-							<!-- Add Player header -->
-							<div class="card-header border-0">
-								<div class="row">
+						<!-- Add Player header -->
+						<div class="card-header border-0">
+							<div class="row">
 
-									<div class="col-auto">
-										<h3 class="mb-0">{{ awayTeam.name }} Add Player </h3>
-									</div>
+								<div class="col-auto">
+									<h3 class="mb-0">{{ awayTeam.name }} Add Player </h3>
 								</div>
 							</div>
+						</div>
 
-							<!-- Add Player Form Starts here -->
-							<div id="form-container-awayTeam" class="card-body">
+						<!-- Add Player Form Starts here -->
+						<div class="card-body">
+							<form id="form-container-awayTeam" method="POST">
+								{% csrf_token %}
 								{{ formsetAwayTeam.management_form }}
 								{% for form in formsetAwayTeam %}
 									<div class="form-row align-items-center" id="awayTeamForm">
@@ -234,56 +247,85 @@
 									</div>
 									<button type="button" class="btn btn-primary" id="awayAddAnother">+</button>
 								{% endfor %}
-							</div>
+							</form>
 						</div>
 					</div>
-
 				</div>
 
+			</div>
 
-				<!-- Adding submit button here -->
-				<div class="row card-wrapper">
 
-					<!-- Creates our Column of size 6 -->
-					<div class="col">
-						<!-- Card for our left side Table for the Home Team -->
-						<div class="card-lg-6">
+		<!-- Adding submit button here -->
+		<div class="row card-wrapper">
 
-							<!-- Add Player header -->
-							<div class="card-header border-0">
-								<div class="row">
+				<!-- Creates our Column of size 6 -->
+				<div class="col-lg-6">
+					<!-- Card for our left side Table for the Home Team -->
+					<div class="card">
 
-									<div class="col-auto">
-										<h3 class="mb-0">Submit </h3>
-									</div>
+						<!-- Add Player header -->
+						<div class="card-header border-0">
+							<div class="row">
+
+								<div class="col-auto">
+									<h3 class="mb-0">Submit </h3>
 								</div>
 							</div>
+						</div>
 
-							<!-- Add Player Form Starts here -->
-							<div class="card-body">
-								<button type="submit" name="submitRoster" class="btn btn-primary btn-simple">Submit</button>
+						<!-- Add Player Form Starts here -->
+						<div class="card-body">
+							<form id="submitAll" method="POST">
+								{% csrf_token %}
+								{{ formsetHomeTeam.management_form }}
+								<button type="submit" name="submitAll" class="btn btn-primary btn-simple">Submit</button>
 
-							</div>
+							</form>
 						</div>
 					</div>
-
 				</div>
 
 			</div>
 
 		</div>
-	</form>
 
+		{#		<div class="card-body ">#}
+		{#			<button type="button" class="btn btn-primary" id="submitRosters">Submit Rosters</button>#}
+		{#		</div>#}
+
+	</div>
 
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE -->
 {% block javascripts %}
+	{#	<script>#}
+	{#      let iceSlotForm = document.querySelectorAll(".form-row")#}
+	{#      let container = document.querySelector("#form-container")#}
+	{#      let addMoreBtn = document.querySelector("#addAnother")#}
+	{#      let totalForms = document.querySelector("#id_form-TOTAL_FORMS")#}
+	{#      let submitButton = document.querySelector("#submitButton")#}
+	{##}
+	{#      let formNum = iceSlotForm.length - 1#}
+	{#      addMoreBtn.addEventListener('click', add_new_form)#}
+	{##}
+	{#      function add_new_form(event) {#}
+	{#          event.preventDefault()#}
+	{#          let newForm = iceSlotForm[0].cloneNode(true)#}
+	{#          let formRegex = RegExp(`form-(\\d){1}-`, 'g')#}
+	{#          formNum++#}
+	{##}
+	{#          newForm.innerHTML = newForm.innerHTML.replace(formRegex, `form-${formNum}-`)#}
+	{#		      container.insertBefore(newForm, addMoreBtn)#}
+	{#container.insertBefore(newForm, submitButton)#}
+	{#          totalForms.setAttribute('value', `${formNum + 1}`)#}
+	{#      }#}
+	{#	</script>#}
 	<script>
       let homeTeamForm = document.querySelectorAll("#homeTeamForm")
       let homeContainer = document.querySelector("#form-container-homeTeam")
       let homeAddMoreBtn = document.querySelector("#homeAddAnother")
-      let homeTotalForms = document.querySelector("#id_home-TOTAL_FORMS")
+      let homeTotalForms = document.querySelector("#id_form-TOTAL_FORMS")
       {#let submitButton = document.querySelector("#submitButton")#}
 
       let homeFormNum = homeTeamForm.length - 1
@@ -292,10 +334,10 @@
       function add_new_form(event) {
           event.preventDefault()
           let newForm = homeTeamForm[0].cloneNode(true)
-          let formRegex = RegExp(`home-(\\d){1}-`, 'g')
+          let formRegex = RegExp(`form-(\\d){1}-`, 'g')
           homeFormNum++
 
-          newForm.innerHTML = newForm.innerHTML.replace(formRegex, `home-${homeFormNum}-`)
+          newForm.innerHTML = newForm.innerHTML.replace(formRegex, `form-${homeFormNum}-`)
           homeContainer.insertBefore(newForm, homeAddMoreBtn)
           homeTotalForms.setAttribute('value', `${homeFormNum + 1}`)
       }
@@ -305,7 +347,7 @@
       let awayTeamForm = document.querySelectorAll("#awayTeamForm")
       let awayContainer = document.querySelector("#form-container-awayTeam")
       let awayAddMoreBtn = document.querySelector("#awayAddAnother")
-      let awayTotalForms = document.querySelector("#id_away-TOTAL_FORMS")
+      let awayTotalForms = document.querySelector("#id_form-TOTAL_FORMS")
       {#let submitButton = document.querySelector("#submitButton")#}
 
       let awayFormNum = awayTeamForm.length - 1
@@ -314,10 +356,10 @@
       function add_new_form(event) {
           event.preventDefault()
           let newForm = awayTeamForm[0].cloneNode(true)
-          let formRegex = RegExp(`away-(\\d){1}-`, 'g')
+          let formRegex = RegExp(`form-(\\d){1}-`, 'g')
           awayFormNum++
 
-          newForm.innerHTML = newForm.innerHTML.replace(formRegex, `away-${awayFormNum}-`)
+          newForm.innerHTML = newForm.innerHTML.replace(formRegex, `form-${awayFormNum}-`)
           awayContainer.insertBefore(newForm, awayAddMoreBtn)
           awayTotalForms.setAttribute('value', `${awayFormNum + 1}`)
       }

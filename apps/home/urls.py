@@ -20,6 +20,7 @@ urlpatterns = [
     path('create-new-season/', views.addSeason, name="addSeason"),
     path('select-game/', views.selectGame, name="selectGame"),
     path('game-report-roster/<str:pk>', views.gameReportRoster, name="gameReportRoster"),
+    path('game-report-stats/', views.gameReportStats, name="gameReportStats"),
 
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),
