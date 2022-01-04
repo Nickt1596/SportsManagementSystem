@@ -175,7 +175,9 @@ def gameReportRoster(request, pk):
             tempGameResult.homePlayers.set(homePlayersPlayed)
             tempGameResult.awayPlayers.set(awayPlayersPlayed)
 
-            return gameReportStats(request, game)
+            return redirect('gameReportStats', game.id)
+
+            # return gameReportStats(request, game)
 
     homeTeamPlayers = Player.objects.filter(team__id=homeTeam.id).all().values().order_by('lastName')
     awayTeamPlayers = Player.objects.filter(team__id=awayTeam.id).all().values().order_by('lastName')
@@ -195,8 +197,9 @@ def gameReportRoster(request, pk):
 
 
 @login_required(login_url="/login/")
-def gameReportStats(request, game):
-    tempGameResult = TempGameResults.objects.get(game=game)
+def gameReportStats(request, gameId):
+    game = Game.objects.get(id=gameId)
+    tempGameResult = TempGameResults.objects.get(game__id=gameId)
     # teams = Team.objects.filter(id__in=teamList)
     homeTeam = Team.objects.get(id=game.homeTeam_id)
     awayTeam = Team.objects.get(id=game.awayTeam_id)
@@ -240,6 +243,9 @@ def gameReportStats(request, game):
 
     if request.method == 'POST':
         print('Test')
+        formsetGoalHome = GoalFormSet(data=request.POST, form_kwargs={'players': homePlayersPlayed}, prefix='goalHome')
+        print(formsetGoalHome)
+
     #     if 'submitAll' in request.POST:
     #         formsetPenalty2 = PenaltyFormSet(data=request.POST, prefix='penalty')
     #         formsetGoal2 = GoalFormSet(data=request.POST, prefix='goal')
@@ -257,6 +263,8 @@ def gameReportStats(request, game):
 #
 #     def get(self, request, *args, **kwargs):
 
+
+# We will need to modify this to make it so it doesn't actually update games played until we confirm the results
 def processPlayedList(postList, formset, team, currentSeason):
     playedList = postList
 
@@ -282,3 +290,11 @@ def processPlayedList(postList, formset, team, currentSeason):
                 playerStatObj.save()
 
     return playedList
+
+
+def processGoals(formset, game):
+    print('Hold')
+
+
+def processPenalties(formset, game):
+    print('Hold')

@@ -319,8 +319,9 @@ class TempGameResults(models.Model):
         ('Tie', 'TIE'),
     ]
     # Will Hold from Step 1 our select game
-    game = models.ForeignKey(Game, on_delete=models.CASCADE, blank=True, null=True)
+    # game = models.ForeignKey(Game, on_delete=models.CASCADE, blank=True, null=True, unique=True)
     # Will hold our Temp Players who played from both teams
+    game = models.OneToOneField(Game, on_delete=models.CASCADE, blank=True, null=True, unique=True)
     homePlayers = models.ManyToManyField(Player, blank=True, related_name='Home_Players_Temp')
     awayPlayers = models.ManyToManyField(Player, blank=True, related_name='Away_Players_Temp')
     winningTeam = models.ForeignKey(Team, on_delete=models.CASCADE, blank=True, null=True,
