@@ -1,0 +1,315 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Game Report Stats {% endblock title %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+	<!-- Page plugins -->
+	<link rel="stylesheet" href="/static/assets/vendor/datatables.net-bs4/css/dataTables.bootstrap4.min.css">
+	<link rel="stylesheet" href="/static/assets/vendor/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css">
+	<link rel="stylesheet" href="/static/assets/vendor/datatables.net-select-bs4/css/select.bootstrap4.min.css">
+
+	<!-- Header -->
+	<!-- All of this contains the breadcrumb up top -->
+	<div class="header bg-primary pb-6">
+		<div class="container-fluid">
+			<div class="header-body">
+				<div class="row align-items-center py-4">
+					<div class="col-lg-6 col-7">
+						<h6 class="h2 text-white d-inline-block mb-0">Admin Portal</h6>
+						<nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+							<ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+								<li class="breadcrumb-item">Admin</li>
+								<li class="breadcrumb-item active" aria-current="page">Home</li>
+							</ol>
+						</nav>
+					</div>
+					<div class="col-lg-6 col-5 text-right">
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<!-- Main Card for the entire page -->
+		<div class="card">
+			<!-- Container Class -->
+			<div class="container-fluid mt--6">
+
+				<!-- Holds Row -->
+				<div class="row card-wrapper ">
+					<div class="col">
+
+						<!-- Card for Action Bar -->
+						<div class="card">
+
+							<div class="card-header border-0">
+								<div class="row">
+									<div class="col text-center">
+										<h3 class="mb-0">Admin Action Bar</h3>
+									</div>
+								</div>
+							</div>
+
+							<!-- Add Player Form Starts here -->
+							<div class="card-body text-center">
+								<a class="btn btn-fill btn-primary" href="{% url 'iceSlotManager' %}" role="button">Manage Games</a>
+								<a class="btn btn-fill btn-primary" href="{% url 'iceSlotManager' %}" role="button">Manage Ice Slots</a>
+								<a class="btn btn-fill btn-primary" href="{% url 'iceSlotManager' %}" role="button">Manage Seasons</a>
+								<a class="btn btn-fill btn-primary" href="{% url 'iceSlotManager' %}" role="button">Manage Referees</a>
+								<a class="btn btn-fill btn-primary" href="{% url 'iceSlotManager' %}" role="button">Manage Scorekeepers</a>
+								<a class="btn btn-fill btn-primary" href="{% url 'iceSlotManager' %}" role="button">Manage Rinks</a>
+							</div>
+
+						</div>
+					</div>
+
+				</div>
+
+
+				<div class="row card-wrapper">
+
+					<div class="col lg-6">
+						<div class="card">
+
+							<div class="card-header border-0">
+								<div class="row">
+									<div class="col text-center">
+										<h3 class="mb-0">Referee Assignments Needed</h3>
+									</div>
+								</div>
+							</div>
+
+							<!-- Light table -->
+							<div class="table-responsive">
+								<table class="table align-items-center table-flush table-hover" id="refAssignments">
+
+									<thead class="thead-light">
+									<tr>
+										<th scope="col" class="sort" data-sort="date">Date</th>
+										<th scope="col" class="sort" data-sort="rink">Rink</th>
+										<th scope="col" class="sort" data-sort="time">Time</th>
+										<th>Game</th>
+										<th scope="col"></th>
+									</tr>
+									</thead>
+
+									<tbody class="list">
+									{% for game in gamesNeedRefs %}
+									<tr>
+										<td class="date">{{ game.iceSlot__date|date:"SHORT_DATE_FORMAT" }}</td>
+										<td class="rink">{{ game.iceSlot__rink__name }}</td>
+										<td class="time">{{ game.iceSlot__time }}</td>
+										<td>{{ game.homeTeam__name }} vs {{ game.awayTeam__name }}</td>
+
+										<td class="text-right">
+											<div class="dropdown">
+												<a class="btn btn btn-icon-only text-light" href="#" role="button" data-toggle="dropdown"
+												   aria-haspopup="true" aria-expanded="false">
+													<i class="fas fa-ellipsis-v"></i>
+												</a>
+												<div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+													<a class="dropdown-item" href="#">Assign Referees</a>
+												</div>
+											</div>
+										</td>
+									</tr>
+									{% endfor %}
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+
+					<div class="col lg-6">
+						<div class="card">
+
+							<div class="card-header border-0">
+								<div class="row">
+									<div class="col text-center">
+										<h3 class="mb-0">Scorekeeper Assignments Needed</h3>
+									</div>
+								</div>
+							</div>
+
+							<!-- Light table -->
+							<div class="table-responsive">
+								<table class="table align-items-center table-flush table-hover" id="scorekeeperAssignments">
+
+									<thead class="thead-light">
+									<tr>
+										<th scope="col" class="sort" data-sort="date">Date</th>
+										<th scope="col" class="sort" data-sort="rink">Rink</th>
+										<th scope="col" class="sort" data-sort="time">Time</th>
+										<th>Game</th>
+										<th scope="col"></th>
+									</tr>
+									</thead>
+
+									<tbody class="list">
+									{% for game in gamesNeedScorekeepers %}
+									<tr>
+										<td class="date">{{ game.iceSlot__date|date:"SHORT_DATE_FORMAT" }}</td>
+										<td class="rink">{{ game.iceSlot__rink__name }}</td>
+										<td class="time">{{ game.iceSlot__time }}</td>
+										<td>{{ game.homeTeam__name }} vs {{ game.awayTeam__name }}</td>
+
+										<td class="text-right">
+											<div class="dropdown">
+												<a class="btn btn btn-icon-only text-light" href="#" role="button" data-toggle="dropdown"
+												   aria-haspopup="true" aria-expanded="false">
+													<i class="fas fa-ellipsis-v"></i>
+												</a>
+												<div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+													<a class="dropdown-item" href="#">Assign Scorekeeper</a>
+												</div>
+											</div>
+										</td>
+									</tr>
+									{% endfor %}
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="row card-wrapper">
+
+
+					<div class="col">
+						<div class="card">
+
+							<div class="card-header border-0">
+								<div class="row">
+									<div class="col text-center">
+										<h3 class="mb-0">Game Reports Needed</h3>
+									</div>
+								</div>
+							</div>
+
+							<!-- Light table -->
+							<div class="table-responsive">
+								<table class="table align-items-center table-flush table-hover" id="gameReports">
+
+									<thead class="thead-light">
+									<tr>
+										<th scope="col" class="sort" data-sort="date">Date</th>
+										<th scope="col" class="sort" data-sort="homeTeam">Home Team</th>
+										<th scope="col" class="sort" data-sort="awayTeam">Away Team</th>
+										<th scope="col" class="sort" data-sort="scorekeeper">Scorekeeper</th>
+										<th scope="col"></th>
+									</tr>
+									</thead>
+
+									<tbody class="list">
+									{% for game in gameNeedResults %}
+									<tr>
+										<td class="date">{{ game.iceSlot__date|date:"SHORT_DATE_FORMAT" }}</td>
+										<td class="homeTeam">{{ game.homeTeam__name }}</td>
+										<td class="awayTeam">{{ game.awayTeam__name }}</td>
+										<td class="scorekeeper">{{ game.scorekeeper__name }}</td>
+
+										<td class="text-right">
+											<div class="dropdown">
+												<a class="btn btn btn-icon-only text-light" href="#" role="button" data-toggle="dropdown"
+												   aria-haspopup="true" aria-expanded="false">
+													<i class="fas fa-ellipsis-v"></i>
+												</a>
+												<div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+													<a class="dropdown-item" href="#">Enter Game Report</a>
+													<a class="dropdown-item" href="#">Quick Game Report</a>
+												</div>
+											</div>
+										</td>
+									</tr>
+									{% endfor %}
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+
+			<div class="row card-wrapper">
+
+
+					<div class="col">
+						<div class="card">
+
+							<div class="card-header border-0">
+								<div class="row">
+									<div class="col text-center">
+										<h3 class="mb-0">Tonights Lineup</h3>
+									</div>
+								</div>
+							</div>
+
+							<!-- Light table -->
+							<div class="table-responsive">
+								<table class="table align-items-center table-flush table-hover" id="gameReports">
+
+									<thead class="thead-light">
+									<tr>
+										<th scope="col" class="sort" data-sort="date">Date</th>
+										<th scope="col" class="sort" data-sort="time">Time</th>
+										<th scope="col" class="sort" data-sort="homeTeam">Home Team</th>
+										<th scope="col" class="sort" data-sort="awayTeam">Away Team</th>
+										<th scope="col"></th>
+									</tr>
+									</thead>
+
+									<tbody class="list">
+									{% for game in todaysGames %}
+									<tr>
+										<td class="date">{{ game.iceSlot__date|date:"SHORT_DATE_FORMAT" }}</td>
+										<td class="time">{{ game.iceSlot__time }}</td>
+										<td class="homeTeam">{{ game.homeTeam__name }}</td>
+										<td class="awayTeam">{{ game.awayTeam__name }}</td>
+
+										<td class="text-right">
+											<div class="dropdown">
+												<a class="btn btn btn-icon-only text-light" href="#" role="button" data-toggle="dropdown"
+												   aria-haspopup="true" aria-expanded="false">
+													<i class="fas fa-ellipsis-v"></i>
+												</a>
+												<div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+													<a class="dropdown-item" href="#">Enter Game Report</a>
+													<a class="dropdown-item" href="#">Quick Game Report</a>
+												</div>
+											</div>
+										</td>
+									</tr>
+									{% endfor %}
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+			</div>
+
+		</div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE -->
+{% block javascripts %}
+<!-- Optional JS -->
+	<script src="/static/assets/vendor/datatables.net/js/jquery.dataTables.min.js"></script>
+	<script src="/static/assets/vendor/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+	<script src="/static/assets/vendor/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+	<script src="/static/assets/vendor/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"></script>
+	<script src="/static/assets/vendor/datatables.net-buttons/js/buttons.html5.min.js"></script>
+	<script src="/static/assets/vendor/datatables.net-buttons/js/buttons.flash.min.js"></script>
+	<script src="/static/assets/vendor/datatables.net-buttons/js/buttons.print.min.js"></script>
+	<script src="/static/assets/vendor/datatables.net-select/js/dataTables.select.min.js"></script>
+{% endblock javascripts %}

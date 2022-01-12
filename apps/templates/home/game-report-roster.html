@@ -75,12 +75,12 @@
 									{% for player in homeTeamPlayers %}
 										<tr>
 											<td>
-												<input type="checkbox" name="homePlayed" value="{{ player.id }}">
+												<input type="checkbox" name="homePlayed" value="{{ player.player__id }}">
 											</td>
 
-											<td>{{ player.firstName }}</td>
-											<td>{{ player.lastName }}</td>
-											<td>{{ player.jerseyNumber }}</td>
+											<td>{{ player.player__firstName }}</td>
+											<td>{{ player.player__lastName }}</td>
+											<td>{{ player.player__jerseyNumber }}</td>
 
 										</tr>
 									{% endfor %}
@@ -126,11 +126,11 @@
 
 										<tr>
 											<td>
-												<input type="checkbox" name="awayPlayed" value="{{ player.id }}">
+												<input type="checkbox" name="awayPlayed" value="{{ player.player__id }}">
 											</td>
-											<td>{{ player.firstName }}</td>
-											<td>{{ player.lastName }}</td>
-											<td>{{ player.jerseyNumber }}</td>
+											<td>{{ player.player__firstName }}</td>
+											<td>{{ player.player__lastName }}</td>
+											<td>{{ player.player__jerseyNumber }}</td>
 										</tr>
 									{% endfor %}
 

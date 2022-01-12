@@ -53,12 +53,14 @@
 								{{ formset.management_form }}
 								{% for form in formset %}
 									<div class="form-row align-items-center" id="iceSlotForm">
+
 										<div class="col-auto">
 											<div class="form-group">
 												<label class="form-control-label">{{ form.rink.label }}</label>
 												{{ form.rink }}
 											</div>
 										</div>
+
 										<div class="col-auto">
 											<div class="form-group">
 												<label class="form-control-label">{{ form.date.label }}</label>
@@ -86,6 +88,7 @@
 
 <!-- Specific Page JS goes HERE -->
 {% block javascripts %}
+	<script src="https://unpkg.com/htmx.org@1.6.1"></script>
 	<script>
       let iceSlotForm = document.querySelectorAll(".form-row")
       let container = document.querySelector("#form-container")

@@ -3,10 +3,9 @@ from apps.home.models import *
 
 
 class Command(BaseCommand):
-    help = 'Load Divisions'
+    help = 'Populate Databases'
 
     def handle(self, *args, **options):
-        loadDivisions()
-        loadTeams()
+        populateDatabases()
         return
 

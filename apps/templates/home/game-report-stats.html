@@ -465,4 +465,35 @@
           penaltyTotalFormsAway.setAttribute('value', `${penaltyFormNumAway + 1}`)
       }
 	</script>
+
+	<script>
+      {#let goalField = goalContainerHome.querySelectorAll("#goalScorer")#}
+      {#console.log(goalField)#}
+			{##}
+      {#let goalContainerHomeTemp = document.querySelector("#goalFormHome")#}
+			{##}
+      {#let newGoalField = document.querySelector("#form-container-goalFormHome #goalScorer")#}
+      {#console.log(goalContainerHomeTemp.querySelectorAll('input,select'))#}
+			{##}
+			{##}
+			{#goalAddMoreBtnHome.addEventListener('click', newForm)#}
+			{##}
+      {#function newForm(event){#}
+      {#    console.log(newGoalField.value)#}
+      {#    console.log(goalContainerHomeTemp.querySelectorAll('input,select'))#}
+		  {#    let updatedGoalField = goalFormHome[goalFormNumHome]#}
+		  {#    console.log(goalFormHome[0].)#}
+
+      {#newGoalField.addEventListener('change', selectionMade)#}
+      {#function selectionMade(event){#}
+      {#    console.log('Selection Changed')#}
+		  {#    console.log(newGoalField.value)#}
+		  {#    if (newGoalField.value === ""){#}
+      {#            console.log('Value is nothing')#}
+		  {#    }#}
+		  {#    newGoalField.required = true#}
+
+      {#console.log(goalField.value)#}
+
+	</script>
 {% endblock javascripts %}
