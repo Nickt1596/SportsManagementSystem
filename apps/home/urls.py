@@ -11,12 +11,13 @@ urlpatterns = [
     # The home page
     path('', views.index, name='home'),
     path('admin-home/', views.adminHome, name="adminHome"),
+    path('team-page/<str:pk>', views.teamPage, name="teamPage"),
+    path('standings/', views.standings, name="standings"),
+    path('schedule/', views.schedule, name="schedule"),
+
+
     path('add-division/', views.addDivision, name="addDivision"),
-    path('referees/', views.referees, name="referees"),
-    path('scorekeepers/', views.scorekeepers, name="scorekeepers"),
     path('rinks/', views.rinks, name="rinks"),
-    path('divisions/', views.divisions, name="divisions"),
-    path('divisions-teams/', views.divisionsAndTeams, name="divisionsAndTeams"),
     path('ice-slot-manager/', views.iceSlotManager, name="iceSlotManager"),
     path('game-manager/', views.gameManager, name="gameManager"),
     path('create-new-season/', views.addSeason, name="addSeason"),

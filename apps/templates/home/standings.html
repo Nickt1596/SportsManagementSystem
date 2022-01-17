@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Division Table {% endblock %}
+{% block title %} Standings {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
@@ -22,7 +22,7 @@
 						<h6 class="h2 text-white d-inline-block mb-0">League Info</h6>
 						<nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
 							<ol class="breadcrumb breadcrumb-links breadcrumb-dark">
-								<li class="breadcrumb-item active" aria-current="page">Divisions</li>
+								<li class="breadcrumb-item active" aria-current="page">Standings</li>
 							</ol>
 						</nav>
 					</div>
@@ -39,37 +39,68 @@
 	<div class="container-fluid mt--6">
 
 		<!-- Table -->
-		<div class="row">
+		<div class="row card-wrapper">
+
 			<div class="col">
 				<div class="card">
-					<!-- Card header -->
-					<div class="card-header">
-						<h3 class="mb-0">Divisions</h3>
+
+					<div class="card-header border-0">
+						<div class="row">
+							<div class="col text-center">
+								<h3 class="mb-0">Standings</h3>
+							</div>
+						</div>
 					</div>
+
+					<!-- Light table -->
+				{% for division in divisionStandings %}
+					{% ifchanged %}
 					<div class="table-responsive py-4">
-						<table class="table table-flush" id="datatable-basic">
+						<table class="table align-items-center table-flush table-hover" id="{{ division.id }}">
 							<thead class="thead-light">
 							<tr>
-								<th>Name</th>
+								<th><h3> {{ division.name }}</h3></th>
+							</tr>
+							<tr>
+								<th>Team</th>
+								<th>GP</th>
+								<th>W</th>
+								<th>L</th>
+								<th>T</th>
+								<th>OTW</th>
+								<th>OTL</th>
+								<th>PTS</th>
 							</tr>
 							</thead>
-							<tfoot>
-							<tr>
-								<th>Name</th>
-							</tr>
-							</tfoot>
+
 							<tbody>
-							{% for division in divisions %}
-								<tr>
-									<td>{{ division.name }}</td>
-								</tr>
+							{% for teamStats in divisionStandings %}
+								{% if division.id == teamStats.id %}
+							<tr>
+								<td class="text-left"><a href="{% url 'teamPage' teamStats.team__id %}" class="nav-link">{{ teamStats.team__name }}</a></td>
+								<td class="text-left">{{ teamStats.team__teamstats__regWins }}</td>
+								<td class="text-left">{{ teamStats.team__teamstats__regWins }}</td>
+								<td class="text-left">{{ teamStats.team__teamstats__regLoses}}</td>
+								<td class="text-left">{{ teamStats.team__teamstats__ties}}</td>
+								<td class="text-left">{{ teamStats.team__teamstats__otWins }}</td>
+								<td class="text-left">{{ teamStats.team__teamstats__otLoses }}</td>
+								<td class="text-left">{{ teamStats.team__teamstats__points}}</td>
+
+
+							</tr>
+								{% endif %}
 							{% endfor %}
+
 							</tbody>
 						</table>
 					</div>
+					{% endifchanged %}
+				{% endfor %}
+
 				</div>
 			</div>
 		</div>
+
 
 		{% include 'includes/footer.html' %}
 
@@ -89,5 +120,20 @@
 	<script src="/static/assets/vendor/datatables.net-buttons/js/buttons.flash.min.js"></script>
 	<script src="/static/assets/vendor/datatables.net-buttons/js/buttons.print.min.js"></script>
 	<script src="/static/assets/vendor/datatables.net-select/js/dataTables.select.min.js"></script>
+		<script>
+		$(document).ready( function () {
+    {% for division in divisionStandings %}
+					{% ifchanged %}
+    $('#{{ division.id }}').DataTable(
+        {
+		        "paging":   false,
+		        "searching":   false,
+		        "info":   false,
+        }
+    );
+    {% endifchanged %}
+							{% endfor %}
+} );
+</script>
 
 {% endblock javascripts %}

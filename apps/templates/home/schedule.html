@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Division and Teams {% endblock %}
+{% block title %} Schedule {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
@@ -22,7 +22,7 @@
 						<h6 class="h2 text-white d-inline-block mb-0">League Info</h6>
 						<nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
 							<ol class="breadcrumb breadcrumb-links breadcrumb-dark">
-								<li class="breadcrumb-item active" aria-current="page">Divisions and Teams</li>
+								<li class="breadcrumb-item active" aria-current="page">Schedule</li>
 							</ol>
 						</nav>
 					</div>
@@ -39,54 +39,57 @@
 	<div class="container-fluid mt--6">
 
 		<!-- Table -->
-		{% for division in divisions %}
-		<div class="row">
+		<div class="row card-wrapper">
+
 			<div class="col">
 				<div class="card">
-					<!-- Card header -->
+
 					<div class="card-header border-0">
 						<div class="row">
-
-							<div class="col-6">
-								<h3 class="mb-0">{{ division.name }}</h3>
+							<div class="col text-center">
+								<h3 class="mb-0">Schedule</h3>
 							</div>
-
-
 						</div>
 					</div>
 
-
 					<!-- Light table -->
-					<div class="table-responsive">
-						<table class="table align-items-center table-flush table-hover">
-
+					{% for date in schedule %}
+					{% ifchanged %}
+					<div class="table-responsive py-4">
+						<table class="table align-items-center table-flush table-hover" id="gameDate">
 							<thead class="thead-light">
 							<tr>
-								<th>Team Name</th>
-								<th>Sample 2</th>
-								<th>Sample 3</th>
+								<th><h3> {{ date.iceSlot__date }}</h3></th>
+							</tr>
+							<tr>
+								<th>Time</th>
+								<th>Away</th>
+								<th>Home</th>
+								<th>Rink</th>
 							</tr>
 							</thead>
 
-
 							<tbody>
-
-							{% for team in teams %}
-								{% if team.division_id == division.id %}
-								<tr>
-									<td>{{ team.name }}</td>
-									<td>Sample 2</td>
-									<td>Sample 3</td>
-								</tr>
-								{% endif %}
+							{% for game in schedule %}
+								{% if date.iceSlot__date == game.iceSlot__date %}
+							<tr>
+								<td class="text-left">{{ game.iceSlot__time }}</td>
+								<td class="text-left">{{ game.awayTeam__name }}</td>
+								<td class="text-left">{{ game.homeTeam__name }}</td>
+								<td class="text-left">{{ game.iceSlot__rink__name }}</td>
+							</tr>
+							{% endif %}
 							{% endfor %}
+
 							</tbody>
 						</table>
 					</div>
+					{% endifchanged %}
+				{% endfor %}
+
 				</div>
 			</div>
 		</div>
-		{% endfor %}
 
 
 		{% include 'includes/footer.html' %}
@@ -107,5 +110,16 @@
 	<script src="/static/assets/vendor/datatables.net-buttons/js/buttons.flash.min.js"></script>
 	<script src="/static/assets/vendor/datatables.net-buttons/js/buttons.print.min.js"></script>
 	<script src="/static/assets/vendor/datatables.net-select/js/dataTables.select.min.js"></script>
+{#		<script>#}
+{#		$(document).ready( function () {#}
+{#    $('#gameDate').DataTable(#}
+{#        {#}
+{#		        "paging":   false,#}
+{#		        "searching":   false,#}
+{#		        "info":   false,#}
+{#        }#}
+{#    );#}
+{#} );#}
+{#</script>#}
 
 {% endblock javascripts %}

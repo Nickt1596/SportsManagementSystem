@@ -9,7 +9,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.template import loader
 from django.urls import reverse
-from django.db.models import Count, OuterRef, Exists
+from django.db.models import Count, OuterRef, Exists, Q
 from django.views import View
 from .models import *
 from .forms import *
@@ -53,8 +53,8 @@ def pages(request):
 def adminHome(request):
     gamesNeedRefs = (
         Game.objects.annotate(referee_count=Count("referees"))
-        .filter(referee_count__lt=2)
-        .values(
+            .filter(referee_count__lt=2)
+            .values(
             "iceSlot__date",
             "iceSlot__rink__name",
             "iceSlot__time",
@@ -64,8 +64,8 @@ def adminHome(request):
     )
     gamesNeedScorekeepers = (
         Game.objects.annotate(scorekeeper_count=Count("scorekeeper"))
-        .filter(scorekeeper_count__lt=1)
-        .values(
+            .filter(scorekeeper_count__lt=1)
+            .values(
             "iceSlot__date",
             "iceSlot__rink__name",
             "iceSlot__time",
@@ -82,27 +82,89 @@ def adminHome(request):
         "iceSlot__date", "iceSlot__time", "homeTeam__name", "awayTeam__name"
     )
 
+    divisionStandings = Division.objects.all().values(
+        'name',
+        'id',
+        'team__name',
+        'team__id',
+        'team__teamstats__regWins',
+        'team__teamstats__regLoses',
+        'team__teamstats__ties',
+        'team__teamstats__otLoses',
+        'team__teamstats__otWins',
+        'team__teamstats__points'
+    )
+
     context = {
         "gamesNeedRefs": gamesNeedRefs,
         "gamesNeedScorekeepers": gamesNeedScorekeepers,
         "gameNeedResults": gameNeedResults,
-        "todaysGames": todaysGames
+        "todaysGames": todaysGames,
+        'divisionStandings': divisionStandings
     }
     return render(request, "home/admin-home.html", context)
 
 
 @login_required(login_url="/login/")
-def divisions(request):
-    divisions = Division.objects.all().values()
-    context = {"divisions": divisions}
-    return render(request, "home/divisions.html", context)
+def teamPage(request, pk):
+    teamStats = TeamStats.objects.filter(team_id=pk).values(
+        'team__name',
+        'regWins',
+        'regLoses',
+        'ties',
+        'otWins',
+        'otLoses',
+        'points'
+    )
+    playerStats = PlayerStats.objects.filter(player__team__id=pk).values(
+        'player__firstName',
+        'player__lastName',
+        'player__jerseyNumber',
+        'player__position',
+        'gamesPlayed',
+        'goals',
+        'assists',
+        'points',
+        'penaltyMins'
+    ).order_by('points')
+
+    teamSchedule = Game.objects.filter(Q(homeTeam__id=pk) | Q(awayTeam__id=pk)).values(
+        'homeTeam__name',
+        'awayTeam__name',
+        'iceSlot__date',
+        'iceSlot__time',
+        'iceSlot__rink__name',
+        'gameresult__winningTeam__name',
+        'gameresult__losingTeam__name',
+        'gameresult__winnerScore',
+        'gameresult__loserScore',
+        'gameresult__winType'
+    ).order_by('iceSlot__date')
+
+    context = {
+        "teamStats": teamStats,
+        "playerStats": playerStats,
+        'teamSchedule': teamSchedule,
+    }
+    return render(request, "home/team-page.html", context)
 
 
 @login_required(login_url="/login/")
-def referees(request):
-    referees = Referee.objects.all().values()
-    context = {"referees": referees}
-    return render(request, "home/referees.html", context)
+def standings(request):
+    divisionStandings = Division.objects.all().values(
+        'name',
+        'id',
+        'team__name',
+        'team__id',
+        'team__teamstats__regWins',
+        'team__teamstats__regLoses',
+        'team__teamstats__ties',
+        'team__teamstats__otLoses',
+        'team__teamstats__otWins',
+        'team__teamstats__points'
+    )
+    context = {"divisionStandings": divisionStandings}
+    return render(request, "home/standings.html", context)
 
 
 @login_required(login_url="/login/")
@@ -113,18 +175,30 @@ def rinks(request):
 
 
 @login_required(login_url="/login/")
-def scorekeepers(request):
-    scorekeepers = Scorekeeper.objects.all().values()
-    context = {"scorekeepers": scorekeepers}
-    return render(request, "home/scorekeepers.html", context)
+def schedule(request):
+    schedule = Game.objects.all().values(
+        'homeTeam__name',
+        'awayTeam__name',
+        'iceSlot__date',
+        'iceSlot__time',
+        'iceSlot__rink__name',
+        'iceSlot__id',
+        'gameresult__winningTeam__name',
+        'gameresult__losingTeam__name',
+        'gameresult__winnerScore',
+        'gameresult__loserScore',
+        'gameresult__winType'
+    ).order_by('iceSlot__date')
+    context = {"schedule": schedule}
+    return render(request, "home/schedule.html", context)
 
 
-@login_required(login_url="/login/")
-def divisionsAndTeams(request):
-    divisions = Division.objects.all().values()
-    teams = Team.objects.all().values()
-    context = {"divisions": divisions, "teams": teams}
-    return render(request, "home/divisions-teams.html", context)
+# ALL OLD VIEWS BELOW
+# ALL OLD VIEWS BELOW
+# ALL OLD VIEWS BELOW
+# ALL OLD VIEWS BELOW
+# ALL OLD VIEWS BELOW
+# ALL OLD VIEWS BELOW
 
 
 @login_required(login_url="/login/")
@@ -258,25 +332,25 @@ def gameReportRoster(request, pk):
     )
     homeTeamPlayers = (
         PlayerStats.objects.filter(player__team__id=homeTeam.id)
-        .all()
-        .values(
+            .all()
+            .values(
             "player__firstName",
             "player__lastName",
             "player__jerseyNumber",
             "player__id",
         )
-        .order_by("player__lastName")
+            .order_by("player__lastName")
     )
     awayTeamPlayers = (
         PlayerStats.objects.filter(player__team__id=awayTeam.id)
-        .all()
-        .values(
+            .all()
+            .values(
             "player__firstName",
             "player__lastName",
             "player__jerseyNumber",
             "player__id",
         )
-        .order_by("player__lastName")
+            .order_by("player__lastName")
     )
     formsetHomeTeam = PlayerFormSet(queryset=Player.objects.none(), prefix="home")
     formsetAwayTeam = PlayerFormSet(queryset=Player.objects.none(), prefix="away")

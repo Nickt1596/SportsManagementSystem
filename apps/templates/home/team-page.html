@@ -1,0 +1,180 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Game Report Stats {% endblock title %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+	<!-- Page plugins -->
+	<link rel="stylesheet" href="/static/assets/vendor/datatables.net-bs4/css/dataTables.bootstrap4.min.css">
+	<link rel="stylesheet" href="/static/assets/vendor/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css">
+	<link rel="stylesheet" href="/static/assets/vendor/datatables.net-select-bs4/css/select.bootstrap4.min.css">
+
+	<!-- Header -->
+	<!-- All of this contains the breadcrumb up top -->
+	<div class="header bg-primary pb-6">
+		<div class="container-fluid">
+			<div class="header-body">
+				<div class="row align-items-center py-4">
+					<div class="col-lg-6 col-7">
+						<h6 class="h2 text-white d-inline-block mb-0">Admin Portal</h6>
+						<nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+							<ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+								<li class="breadcrumb-item">Admin</li>
+								<li class="breadcrumb-item active" aria-current="page">Home</li>
+							</ol>
+						</nav>
+					</div>
+					<div class="col-lg-6 col-5 text-right">
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<!-- Main Card for the entire page -->
+		<div class="card">
+			<!-- Container Class -->
+			<div class="container-fluid mt--6">
+
+
+			<div class="row card-wrapper">
+
+
+					<div class="col-lg-10">
+						<div class="card">
+
+							{% for teamStats in teamStats %}
+							<div class="card-header border-0">
+								<div class="row">
+									<div class="col text-left">
+										<h2 class="mb-0">{{ teamStats.team__name }}</h2>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col text-left">
+										<h4 class="mb-0">Record: {{ teamStats.regWins }}W-{{ teamStats.regLoses }}L-{{ teamStats.ties }}T-{{ teamStats.otWins }}OTW-{{ teamStats.otLoses }}OTL  {{ teamStats.points }}PTS</h4>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col text-left">
+										<h4 class="mb-0">Next Game</h4>
+									</div>
+								</div>
+								<div class="row">
+									<div class="btn-group" role="group" aria-label="Basic example">
+              <button type="button" class="btn btn-secondary">Statistics</button>
+              <button type="button" class="btn btn-secondary active">Schedule</button>
+              <button type="button" class="btn btn-secondary">Roster</button>
+            </div>
+								</div>
+								<hr />
+							</div>
+							{% endfor %}
+
+							<!-- Light table -->
+							<div class="table-responsive col-lg-12 center">
+								<table class="table align-items-center table-flush table-hover" id="playerStats">
+
+									<thead class="thead-light">
+									<tr>
+										<th scope="col" class="sort" data-sort="player">Player</th>
+										<th scope="col" class="sort" data-sort="jerseyNumber">#</th>
+										<th scope="col" class="sort" data-sort="position">Position</th>
+										<th scope="col" class="sort" data-sort="gamesPlayed">GP</th>
+										<th scope="col" class="sort" data-sort="goals">G</th>
+										<th scope="col" class="sort" data-sort="assists">A</th>
+										<th scope="col" class="sort" data-sort="points">PTS</th>
+										<th scope="col" class="sort" data-sort="pim">PIM</th>
+									</tr>
+									</thead>
+
+									<tbody class="list">
+									{% for player in playerStats %}
+									<tr>
+										<td class="player">{{ player.player__firstName }} {{ player.player__lastName }}</td>
+										<td class="jerseyNumber">{{ player.player__jerseyNumber }}</td>
+										<td class="position">{{ player.player__position }}</td>
+										<td class="gamesPlayed">{{ player.gamesPlayed }}</td>
+										<td class="goals">{{ player.goals }}</td>
+										<td class="assists">{{ player.assists }}</td>
+										<td class="points">{{ player.points }}</td>
+										<td class="pim">{{ player.penaltyMins }}</td>
+									</tr>
+									{% endfor %}
+									</tbody>
+								</table>
+							</div>
+
+
+						<hr />
+						<!-- Light table -->
+							<div class="table-responsive col-lg-12 center">
+								<table class="table align-items-center table-flush table-hover" id="teamSchedule">
+
+									<thead class="thead-light">
+									<tr>
+										<th scope="col" class="sort" data-sort="away">Away</th>
+										<th scope="col" class="sort" data-sort="home">Home</th>
+										<th scope="col" class="sort" data-sort="rink">Rink</th>
+										<th scope="col" class="sort" data-sort="date">Date</th>
+										<th scope="col" class="sort" data-sort="time">Time</th>
+									</tr>
+									</thead>
+
+									<tbody class="list">
+									{% for team in teamSchedule %}
+									<tr>
+										<td class="away">{{ team.awayTeam__name }}</td>
+										<td class="home">{{ team.homeTeam__name }}</td>
+										<td class="rink">{{ team.iceSlot__rink__name }}</td>
+										<td class="date">{{ team.iceSlot__date|date:"SHORT_DATE_FORMAT"  }}</td>
+										<td class="time">{{ team.iceSlot__time }}</td>
+									</tr>
+									</tbody>
+									{% endfor %}
+								</table>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE -->
+{% block javascripts %}
+<!-- Optional JS -->
+	<script src="/static/assets/vendor/datatables.net/js/jquery.dataTables.min.js"></script>
+	<script src="/static/assets/vendor/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+	<script src="/static/assets/vendor/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+	<script src="/static/assets/vendor/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"></script>
+	<script src="/static/assets/vendor/datatables.net-buttons/js/buttons.html5.min.js"></script>
+	<script src="/static/assets/vendor/datatables.net-buttons/js/buttons.flash.min.js"></script>
+	<script src="/static/assets/vendor/datatables.net-buttons/js/buttons.print.min.js"></script>
+	<script src="/static/assets/vendor/datatables.net-select/js/dataTables.select.min.js"></script>
+	<script>
+		$(document).ready( function () {
+    $('#playerStats').DataTable(
+        {
+		        "paging":   false,
+		        "searching":   false,
+		        "info":   false,
+        }
+    );
+    $('#teamSchedule').DataTable(
+        {
+		        "paging":   false,
+		        "searching":   false,
+		        "info":   false,
+        }
+    );
+} );
+</script>
+{% endblock javascripts %}

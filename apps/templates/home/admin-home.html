@@ -294,6 +294,68 @@
 					</div>
 				</div>
 
+			<div class="row card-wrapper">
+
+			<div class="col">
+				<div class="card">
+
+					<div class="card-header border-0">
+						<div class="row">
+							<div class="col text-center">
+								<h3 class="mb-0">Standings</h3>
+							</div>
+						</div>
+					</div>
+
+					<!-- Light table -->
+				{% for division in divisionStandings %}
+					{% ifchanged %}
+					<div class="table-responsive py-4">
+						<table class="table align-items-center table-flush table-hover" id="gameReports">
+							<thead class="thead-light">
+							<tr>
+								<th><h3> {{ division.name }}</h3></th>
+							</tr>
+							<tr>
+								<th>Team</th>
+								<th>GP</th>
+								<th>W</th>
+								<th>L</th>
+								<th>T</th>
+								<th>OTW</th>
+								<th>OTL</th>
+								<th>PTS</th>
+							</tr>
+							</thead>
+
+							<tbody>
+							{% for teamStats in divisionStandings %}
+								{% if division.id == teamStats.id %}
+							<tr>
+								<td class="text-left"><a href="{% url 'teamPage' teamStats.team__id %}" class="nav-link">{{ teamStats.team__name }}</a></td>
+								<td class="text-left">{{ teamStats.team__teamstats__regWins }}</td>
+								<td class="text-left">{{ teamStats.team__teamstats__regWins }}</td>
+								<td class="text-left">{{ teamStats.team__teamstats__regLoses}}</td>
+								<td class="text-left">{{ teamStats.team__teamstats__ties}}</td>
+								<td class="text-left">{{ teamStats.team__teamstats__otWins }}</td>
+								<td class="text-left">{{ teamStats.team__teamstats__otLoses }}</td>
+								<td class="text-left">{{ teamStats.team__teamstats__points}}</td>
+
+
+							</tr>
+								{% endif %}
+							{% endfor %}
+
+							</tbody>
+						</table>
+					</div>
+					{% endifchanged %}
+				{% endfor %}
+
+				</div>
+			</div>
+		</div>
+
 
 			</div>
 
