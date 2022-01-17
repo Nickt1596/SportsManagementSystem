@@ -207,6 +207,20 @@ def iceSlotManager(request):
     context = {"formset": formset}
     return render(request, "home/ice-slot-manager.html", context)
 
+@login_required(login_url="/login/")
+def gameManager(request):
+    if request.method == "GET":
+        # we don't want to display the already saved model instances
+        formset = GameFormSet(queryset=Game.objects.none())
+    elif request.method == "POST":
+        formset = GameFormSet(request.POST)
+        if formset.is_valid():
+            for form in formset:
+                form.save()
+            return redirect("home")
+    context = {"formset": formset}
+    return render(request, "home/game-manager.html", context)
+
 
 # ALL OLD VIEWS BELOW
 # ALL OLD VIEWS BELOW
@@ -252,20 +266,6 @@ def addDivision(request):
     context = {"form": form}
     return render(request, "home/add-division.html", context)
 
-
-@login_required(login_url="/login/")
-def gameManager(request):
-    if request.method == "GET":
-        # we don't want to display the already saved model instances
-        formset = GameFormSet(queryset=Game.objects.none())
-    elif request.method == "POST":
-        formset = GameFormSet(request.POST)
-        if formset.is_valid():
-            for form in formset:
-                form.save()
-            return redirect("home")
-    context = {"formset": formset}
-    return render(request, "home/game-manager.html", context)
 
 
 @login_required(login_url="/login/")

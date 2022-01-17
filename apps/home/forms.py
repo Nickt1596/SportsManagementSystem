@@ -149,43 +149,40 @@ class GameForm(ModelForm):
     class Meta:
         model = Game
         fields = ["homeTeam", "awayTeam", "iceSlot", "scorekeeper", "referees"]
-        labels = {
-            "homeTeam": "Home Team",
-            "awayTeam": "Away Team",
-            "iceSlot": "Ice Slot",
-            "scorekeeper": "Score Keeper",
-        }
 
     def __init__(self, *args, **kwargs):
         super(GameForm, self).__init__(*args, **kwargs)
-        self.fields["iceSlot"].choices = IceSlot.objects.filter(available=True)
+        self.fields["homeTeam"].label = "Home Team"
+        self.fields["homeTeam"].widget = Select(
+            attrs={"class": "form-control", "id": "homeTeam", "required": "required"}
+        )
+        self.fields["homeTeam"].queryset = Team.objects.all()
+        self.fields["awayTeam"].label = "Away Team"
+        self.fields["awayTeam"].widget = Select(
+            attrs={"class": "form-control", "id": "awayTeam", "required": "required"}
+        )
+        self.fields["awayTeam"].queryset = Team.objects.all()
+        self.fields["iceSlot"].label = "Ice Slot"
+        self.fields["iceSlot"].widget = Select(
+            attrs={"class": "form-control", "id": "iceSlot", "required": "required"}
+        )
+        self.fields["iceSlot"].queryset = IceSlot.objects.filter(available=True)
+        self.fields["scorekeeper"].label = "Scorekeeper"
+        self.fields["scorekeeper"].widget = Select(
+            attrs={"class": "form-control", "id": "scorekeeper"}
+        )
+        self.fields["scorekeeper"].queryset = Scorekeeper.objects.all()
+        self.fields["referees"].label = "Referees"
+        self.fields["referees"].widget = SelectMultiple(
+            attrs={
+                "class": "form-control",
+                "id": "referees",
+            }
+        )
+        self.fields["referees"].queryset = Referee.objects.all()
 
-        for name, field in self.fields.items():
-            field.widget.attrs.update({"class": "form-control"})
 
-
-GameFormSet = modelformset_factory(
-    Game,
-    fields=("homeTeam", "awayTeam", "iceSlot", "scorekeeper", "referees"),
-    labels={
-        "homeTeam": "Home Team",
-        "awayTeam": "Away Team",
-        "iceSlot": "Ice Slot",
-        "scorekeeper": "Scorekeeper",
-        "referees": "Referees",
-    },
-    extra=1,
-    widgets={
-        "homeTeam": Select(attrs={"class": "form-control", "id": "homeTeam"}),
-        "awayTeam": Select(attrs={"class": "form-control", "id": "awayTeam"}),
-        "iceSlot": Select(attrs={"class": "form-control", "id": "iceSlot"}),
-        "scorekeeper": Select(attrs={"class": "form-control", "id": "scorekeeper"}),
-        # 'referees': Select(attrs={
-        #     'class': 'form-control',
-        #     'id': 'referees'
-        # })
-    },
-)
+GameFormSet = modelformset_factory(model=Game, form=GameForm, extra=1)
 
 
 class IceSlotForm(ModelForm):
