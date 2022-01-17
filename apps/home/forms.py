@@ -145,50 +145,6 @@ class GoalForm(ModelForm):
 GoalFormSet = modelformset_factory(model=Goal, form=GoalForm, extra=1)
 
 
-# class PlayerForm(ModelForm):
-#     class Meta:
-#         model = Player
-#         fields = {"firstName", "lastName", "jerseyNumber"}
-#
-#     def __init__(self, *args, **kwargs):
-#         super(PlayerForm, self).__init__(*args, **kwargs)
-#
-#         for name, field in self.fields.items():
-#             field.widget.attrs.update(
-#                 {"class": "form-control", "type": "text", "placeholder": "placeholder"}
-#             )
-#
-#
-# PlayerFormSet = modelformset_factory(
-#     Player,
-#     fields={"firstName", "lastName", "jerseyNumber"},
-#     extra=1,
-#     widgets={
-#         "firstName": forms.TextInput(
-#             attrs={
-#                 "class": "form-control",
-#                 "placeholder": "First Name",
-#                 "id": "firstName",
-#             }
-#         ),
-#         "lastName": forms.TextInput(
-#             attrs={
-#                 "class": "form-control",
-#                 "placeholder": "Last Name",
-#                 "id": "lastName",
-#             }
-#         ),
-#         "jerseyNumber": forms.TextInput(
-#             attrs={
-#                 "class": "form-control",
-#                 "placeholder": "Jersey #",
-#                 "id": "jerseyNumber",
-#             }
-#         ),
-#     },
-# )
-
-
 class GameForm(ModelForm):
     class Meta:
         model = Game
@@ -236,48 +192,37 @@ class IceSlotForm(ModelForm):
     class Meta:
         model = IceSlot
         fields = ["rink", "date", "time"]
-        labels = {
-            "rink": "Rink",
-            "date": "Date",
-            "time": "Time",
-        }
 
     def __init__(self, *args, **kwargs):
         super(IceSlotForm, self).__init__(*args, **kwargs)
+        self.fields["rink"].label = "Rink"
+        self.fields["rink"].widget = Select(
+            attrs={"class": "form-control", "id": "iceSlotRink", "required": "required"}
+        )
+        self.fields["rink"].queryset = Rink.objects.all()
 
-        for name, field in self.fields.items():
-            field.widget.attrs.update({"class": "form-control"})
-
-
-IceSlotFormSet = modelformset_factory(
-    IceSlot,
-    fields=("rink", "date", "time"),
-    labels={
-        "rink": "Rink",
-        "date": "Date",
-        "time": "Time",
-    },
-    extra=1,
-    widgets={
-        "date": forms.DateInput(
+        self.fields["date"].label = "Date"
+        self.fields["date"].widget = DateInput(
             attrs={
                 "class": "form-control",
                 "type": "date",
                 "id": "iceSlotDate",
                 "value": date.today(),
+                "required": "required",
             }
-        ),
-        "time": forms.TimeInput(
+        )
+        self.fields["time"].label = "Time"
+        self.fields["time"].widget = TimeInput(
             attrs={
                 "class": "form-control",
                 "type": "time",
                 "id": "iceSlotTime",
                 "value": "20:30:00",
             }
-        ),
-        "rink": Select(attrs={"class": "form-control", "id": "iceSlotRink"}),
-    },
-)
+        )
+
+
+IceSlotFormSet = modelformset_factory(model=IceSlot, form=IceSlotForm, extra=1)
 
 
 class SeasonForm(ModelForm):
@@ -359,7 +304,9 @@ class TeamForm(ModelForm):
         self.fields["division"].widget = Select(
             attrs={"class": "form-control", "id": "division", "required": "required"}
         )
-        self.fields["division"].queryset = Division.objects.filter(season__seasonCompleted=False)
+        self.fields["division"].queryset = Division.objects.filter(
+            season__seasonCompleted=False
+        )
         self.fields["name"].label = "Name"
         self.fields["name"].widget = TextInput(
             attrs={
@@ -374,7 +321,15 @@ class TeamForm(ModelForm):
 class PlayerForm(ModelForm):
     class Meta:
         model = Player
-        fields = ["team", "firstName", "lastName", "jerseyNumber", "position", "captain", "altCaptain"]
+        fields = [
+            "team",
+            "firstName",
+            "lastName",
+            "jerseyNumber",
+            "position",
+            "captain",
+            "altCaptain",
+        ]
 
     def __init__(self, *args, **kwargs):
         super(PlayerForm, self).__init__(*args, **kwargs)
@@ -382,7 +337,9 @@ class PlayerForm(ModelForm):
         self.fields["team"].widget = Select(
             attrs={"class": "form-control", "id": "team", "required": "required"}
         )
-        self.fields["team"].queryset = Team.objects.filter(division__season__seasonCompleted=False)
+        self.fields["team"].queryset = Team.objects.filter(
+            division__season__seasonCompleted=False
+        )
 
         self.fields["firstName"].label = "First Name"
         self.fields["firstName"].widget = TextInput(

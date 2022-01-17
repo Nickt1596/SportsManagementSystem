@@ -193,6 +193,21 @@ def schedule(request):
     return render(request, "home/schedule.html", context)
 
 
+@login_required(login_url="/login/")
+def iceSlotManager(request):
+    if request.method == "GET":
+        # we don't want to display the already saved model instances
+        formset = IceSlotFormSet(queryset=IceSlot.objects.none())
+    elif request.method == "POST":
+        formset = IceSlotFormSet(request.POST)
+        if formset.is_valid():
+            for form in formset:
+                form.save()
+            return redirect("home")
+    context = {"formset": formset}
+    return render(request, "home/ice-slot-manager.html", context)
+
+
 # ALL OLD VIEWS BELOW
 # ALL OLD VIEWS BELOW
 # ALL OLD VIEWS BELOW
@@ -236,22 +251,6 @@ def addDivision(request):
             return redirect("home")
     context = {"form": form}
     return render(request, "home/add-division.html", context)
-
-
-@login_required(login_url="/login/")
-def iceSlotManager(request):
-    if request.method == "GET":
-        # we don't want to display the already saved model instances
-        formset = IceSlotFormSet(queryset=IceSlot.objects.none())
-    elif request.method == "POST":
-        print(request.POST)
-        formset = IceSlotFormSet(request.POST)
-        if formset.is_valid():
-            for form in formset:
-                form.save()
-            return redirect("home")
-    context = {"formset": formset}
-    return render(request, "home/ice-slot-manager.html", context)
 
 
 @login_required(login_url="/login/")
