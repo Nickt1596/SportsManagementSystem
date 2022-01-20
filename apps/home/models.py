@@ -257,6 +257,8 @@ class GameResult(models.Model):
     winType = models.CharField(max_length=100, choices=WIN_TYPES)
     winnerScore = models.IntegerField()
     loserScore = models.IntegerField()
+    # Quick Report used when only entering the score of the game
+    quickReport = models.BooleanField(default=False)
     date_modified = models.DateTimeField(auto_now=True)
     date_created = models.DateTimeField(auto_now_add=True)
     id = models.UUIDField(

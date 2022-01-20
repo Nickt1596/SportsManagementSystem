@@ -1,11 +1,12 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Game Report Select Game {% endblock title %}
+{% block title %} Standings {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
+
 	<!-- Page plugins -->
 	<link rel="stylesheet" href="/static/assets/vendor/datatables.net-bs4/css/dataTables.bootstrap4.min.css">
 	<link rel="stylesheet" href="/static/assets/vendor/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css">
@@ -18,11 +19,10 @@
 			<div class="header-body">
 				<div class="row align-items-center py-4">
 					<div class="col-lg-6 col-7">
-						<h6 class="h2 text-white d-inline-block mb-0">Game Report</h6>
+						<h6 class="h2 text-white d-inline-block mb-0">Admin Portal</h6>
 						<nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
 							<ol class="breadcrumb breadcrumb-links breadcrumb-dark">
-								<li class="breadcrumb-item">Game Report</li>
-								<li class="breadcrumb-item active" aria-current="page">Select Game</li>
+								<li class="breadcrumb-item active" aria-current="page">Edit Games</li>
 							</ol>
 						</nav>
 					</div>
@@ -39,41 +39,72 @@
 	<div class="container-fluid mt--6">
 
 		<!-- Table -->
-		<div class="row">
+		<div class="row card-wrapper">
+
 			<div class="col">
 				<div class="card">
-					<!-- Card header -->
-					<div class="card-header">
-						<h3 class="mb-0">Select Game</h3>
+
+					<div class="card-header border-0">
+						<div class="row">
+							<div class="col text-center">
+								<h3 class="mb-0">Game Editor</h3>
+							</div>
+						</div>
 					</div>
+
+					<!-- Light table -->
 					<div class="table-responsive py-4">
-						<table class="table table-flush" id="datatable-basic">
+						<table class="table align-items-center table-flush table-hover" id="gameEditor">
 							<thead class="thead-light">
 							<tr>
 								<th>Date</th>
+								<th>Time</th>
+								<th>Rink</th>
 								<th>Home Team</th>
 								<th>Away Team</th>
-								<th>Select</th>
+								<th>Actions</th>
 							</tr>
 							</thead>
 
 							<tbody>
 							{% for game in games %}
-								<tr>
-									<td>{{ game.iceSlot__date }}</td>
-									<td>{{ game.homeTeam__name }}</td>
-									<td>{{ game.awayTeam__name }}</td>
-									<td>
-										<a href="{% url 'gameReportRoster' game.id %}" class="btn btn-fill btn-primary btm-sm">Select</a>
-									</td>
-								</tr>
+							<tr>
+								<td class="text-left">{{ game.iceSlot__date }}</td>
+								<td class="text-left">{{ game.iceSlot__time }}</td>
+								<td class="text-left">{{ game.iceSlot__rink__name }}</td>
+								<td class="text-left">{{ game.homeTeam__name}}</td>
+								<td class="text-left">{{ game.awayTeam__name }}</td>
+								<td class="text-left">
+									<div class="dropdown">
+										<a class="btn btn btn-icon-only text-light" href="#" role="button" data-toggle="dropdown"
+										   aria-haspopup="true" aria-expanded="false">
+											<i class="fas fa-ellipsis-v"></i>
+										</a>
+										<div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+											<a class="dropdown-item" href="#">Change Ice Slot</a>
+											<a class="dropdown-item" href="#">Change Home Team</a>
+											<a class="dropdown-item" href="#">Change Away Team</a>
+											<a class="dropdown-item" href="#">Change Referees</a>
+											<a class="dropdown-item" href="#">Change Scorekeepers</a>
+											<a class="dropdown-item" href="#">Modify Ice Slot</a>
+											<a class="dropdown-item" href="#">Enter Game Report</a>
+											<a class="dropdown-item" href="#">Edit Game Report</a>
+										</div>
+									</div>
+								</td>
+
+
+							</tr>
 							{% endfor %}
+
 							</tbody>
 						</table>
 					</div>
+
 				</div>
 			</div>
 		</div>
+
 
 		{% include 'includes/footer.html' %}
 
@@ -81,7 +112,7 @@
 
 {% endblock content %}
 
-<!-- Specific Page JS goes HERE -->
+<!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 
 	<!-- Optional JS -->
@@ -93,5 +124,11 @@
 	<script src="/static/assets/vendor/datatables.net-buttons/js/buttons.flash.min.js"></script>
 	<script src="/static/assets/vendor/datatables.net-buttons/js/buttons.print.min.js"></script>
 	<script src="/static/assets/vendor/datatables.net-select/js/dataTables.select.min.js"></script>
+		<script>
+		$(document).ready( function () {
+    $('#gameEditor').DataTable(
+    );
+} );
+</script>
 
 {% endblock javascripts %}

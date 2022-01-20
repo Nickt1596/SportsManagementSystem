@@ -1,0 +1,100 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Quick Game Report {% endblock title %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+	<!-- Header -->
+	<div class="header bg-primary pb-6">
+		<div class="container-fluid">
+			<div class="header-body">
+				<div class="row align-items-center py-4">
+					<div class="col-lg-6 col-7">
+						<h6 class="h2 text-white d-inline-block mb-0">Admin Portal</h6>
+						<nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+							<ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+								<li class="breadcrumb-item active" aria-current="page">Quick Game Report</li>
+							</ol>
+						</nav>
+					</div>
+					<div class="col-lg-6 col-5 text-right">
+						{#						              <a href="#" class="btn btn-sm btn-neutral">New</a>#}
+						{#						              <a href="#" class="btn btn-sm btn-neutral">Filters</a>#}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="card">
+		<div class="container-fluid mt--6">
+			<div class="row card-wrapper">
+
+				<div class="col">
+					<div class="card">
+						<!-- Card header -->
+						<div class="card-header border-0">
+							<div class="row">
+
+								<div class="col-6">
+									<h3 class="mb-0">Quick Game Report</h3>
+								</div>
+
+							</div>
+						</div>
+
+						<div class="card-body">
+							<form id="form-container" method="POST">
+								{% csrf_token %}
+									<div class="form-row align-items-center" id="quickGameResult">
+
+										<div class="col-auto">
+											<div class="form-group">
+												<label class="form-control-label">{{ quickGameResultForm.winningTeam.label }}</label>
+												{{ quickGameResultForm.winningTeam }}
+											</div>
+										</div>
+
+										<div class="col-auto">
+											<div class="form-group">
+												<label class="form-control-label">{{ quickGameResultForm.losingTeam.label }}</label>
+												{{ quickGameResultForm.losingTeam }}
+											</div>
+										</div>
+										<div class="col-auto">
+											<div class="form-group">
+												<label class="form-control-label">{{ quickGameResultForm.winnerScore.label }}</label>
+												{{ quickGameResultForm.winnerScore}}
+											</div>
+										</div>
+									<div class="col-auto">
+											<div class="form-group">
+												<label class="form-control-label">{{ quickGameResultForm.loserScore.label }}</label>
+												{{ quickGameResultForm.loserScore}}
+											</div>
+										</div>
+									<div class="col-auto">
+											<div class="form-group">
+												<label class="form-control-label">{{ quickGameResultForm.winType.label }}</label>
+												{{ quickGameResultForm.winType}}
+											</div>
+										</div>
+									</div>
+									<button type="submit" class="btn btn-fill btn-primary" id="submitButton">Submit</button>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE -->
+{% block javascripts %}
+
+{% endblock javascripts %}

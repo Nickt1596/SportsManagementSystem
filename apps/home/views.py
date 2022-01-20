@@ -83,16 +83,16 @@ def adminHome(request):
     )
 
     divisionStandings = Division.objects.all().values(
-        'name',
-        'id',
-        'team__name',
-        'team__id',
-        'team__teamstats__regWins',
-        'team__teamstats__regLoses',
-        'team__teamstats__ties',
-        'team__teamstats__otLoses',
-        'team__teamstats__otWins',
-        'team__teamstats__points'
+        "name",
+        "id",
+        "team__name",
+        "team__id",
+        "team__teamstats__regWins",
+        "team__teamstats__regLoses",
+        "team__teamstats__ties",
+        "team__teamstats__otLoses",
+        "team__teamstats__otWins",
+        "team__teamstats__points",
     )
 
     context = {
@@ -100,7 +100,7 @@ def adminHome(request):
         "gamesNeedScorekeepers": gamesNeedScorekeepers,
         "gameNeedResults": gameNeedResults,
         "todaysGames": todaysGames,
-        'divisionStandings': divisionStandings
+        "divisionStandings": divisionStandings,
     }
     return render(request, "home/admin-home.html", context)
 
@@ -108,43 +108,45 @@ def adminHome(request):
 @login_required(login_url="/login/")
 def teamPage(request, pk):
     teamStats = TeamStats.objects.filter(team_id=pk).values(
-        'team__name',
-        'regWins',
-        'regLoses',
-        'ties',
-        'otWins',
-        'otLoses',
-        'points'
+        "team__name", "regWins", "regLoses", "ties", "otWins", "otLoses", "points"
     )
-    playerStats = PlayerStats.objects.filter(player__team__id=pk).values(
-        'player__firstName',
-        'player__lastName',
-        'player__jerseyNumber',
-        'player__position',
-        'gamesPlayed',
-        'goals',
-        'assists',
-        'points',
-        'penaltyMins'
-    ).order_by('points')
+    playerStats = (
+        PlayerStats.objects.filter(player__team__id=pk)
+            .values(
+            "player__firstName",
+            "player__lastName",
+            "player__jerseyNumber",
+            "player__position",
+            "gamesPlayed",
+            "goals",
+            "assists",
+            "points",
+            "penaltyMins",
+        )
+            .order_by("points")
+    )
 
-    teamSchedule = Game.objects.filter(Q(homeTeam__id=pk) | Q(awayTeam__id=pk)).values(
-        'homeTeam__name',
-        'awayTeam__name',
-        'iceSlot__date',
-        'iceSlot__time',
-        'iceSlot__rink__name',
-        'gameresult__winningTeam__name',
-        'gameresult__losingTeam__name',
-        'gameresult__winnerScore',
-        'gameresult__loserScore',
-        'gameresult__winType'
-    ).order_by('iceSlot__date')
+    teamSchedule = (
+        Game.objects.filter(Q(homeTeam__id=pk) | Q(awayTeam__id=pk))
+            .values(
+            "homeTeam__name",
+            "awayTeam__name",
+            "iceSlot__date",
+            "iceSlot__time",
+            "iceSlot__rink__name",
+            "gameresult__winningTeam__name",
+            "gameresult__losingTeam__name",
+            "gameresult__winnerScore",
+            "gameresult__loserScore",
+            "gameresult__winType",
+        )
+            .order_by("iceSlot__date")
+    )
 
     context = {
         "teamStats": teamStats,
         "playerStats": playerStats,
-        'teamSchedule': teamSchedule,
+        "teamSchedule": teamSchedule,
     }
     return render(request, "home/team-page.html", context)
 
@@ -152,16 +154,16 @@ def teamPage(request, pk):
 @login_required(login_url="/login/")
 def standings(request):
     divisionStandings = Division.objects.all().values(
-        'name',
-        'id',
-        'team__name',
-        'team__id',
-        'team__teamstats__regWins',
-        'team__teamstats__regLoses',
-        'team__teamstats__ties',
-        'team__teamstats__otLoses',
-        'team__teamstats__otWins',
-        'team__teamstats__points'
+        "name",
+        "id",
+        "team__name",
+        "team__id",
+        "team__teamstats__regWins",
+        "team__teamstats__regLoses",
+        "team__teamstats__ties",
+        "team__teamstats__otLoses",
+        "team__teamstats__otWins",
+        "team__teamstats__points",
     )
     context = {"divisionStandings": divisionStandings}
     return render(request, "home/standings.html", context)
@@ -176,19 +178,23 @@ def rinks(request):
 
 @login_required(login_url="/login/")
 def schedule(request):
-    schedule = Game.objects.all().values(
-        'homeTeam__name',
-        'awayTeam__name',
-        'iceSlot__date',
-        'iceSlot__time',
-        'iceSlot__rink__name',
-        'iceSlot__id',
-        'gameresult__winningTeam__name',
-        'gameresult__losingTeam__name',
-        'gameresult__winnerScore',
-        'gameresult__loserScore',
-        'gameresult__winType'
-    ).order_by('iceSlot__date')
+    schedule = (
+        Game.objects.all()
+            .values(
+            "homeTeam__name",
+            "awayTeam__name",
+            "iceSlot__date",
+            "iceSlot__time",
+            "iceSlot__rink__name",
+            "iceSlot__id",
+            "gameresult__winningTeam__name",
+            "gameresult__losingTeam__name",
+            "gameresult__winnerScore",
+            "gameresult__loserScore",
+            "gameresult__winType",
+        )
+            .order_by("iceSlot__date")
+    )
     context = {"schedule": schedule}
     return render(request, "home/schedule.html", context)
 
@@ -207,6 +213,7 @@ def iceSlotManager(request):
     context = {"formset": formset}
     return render(request, "home/ice-slot-manager.html", context)
 
+
 @login_required(login_url="/login/")
 def gameManager(request):
     if request.method == "GET":
@@ -220,6 +227,181 @@ def gameManager(request):
             return redirect("home")
     context = {"formset": formset}
     return render(request, "home/game-manager.html", context)
+
+
+@login_required(login_url="/login/")
+def editGames(request):
+    games = (
+        Game.objects.all()
+            .values(
+            "homeTeam__name",
+            "awayTeam__name",
+            "iceSlot__date",
+            "iceSlot__time",
+            "iceSlot__rink__name",
+            "iceSlot__id",
+            "gameresult__winningTeam__name",
+            "gameresult__losingTeam__name",
+            "gameresult__winnerScore",
+            "gameresult__loserScore",
+            "gameresult__winType",
+        )
+            .order_by("iceSlot__date")
+    )
+    context = {"games": games}
+    return render(request, "home/edit-games.html", context)
+
+
+@login_required(login_url="/login/")
+def gameReportSelectGame(request):
+    games = Game.objects.all().values(
+        "iceSlot__date", "homeTeam__name", "awayTeam__name", "id"
+    )
+    context = {"games": games}
+    return render(request, "home/game-report-select-game.html", context)
+
+
+@login_required(login_url="/login/")
+def gameReportQuick(request, pk):
+    gameTeams = Game.objects.get(id=pk)
+    quickGameResultForm = GameResultQuickForm(
+        teams=Team.objects.filter(
+            id__in=[gameTeams.homeTeam.id, gameTeams.awayTeam.id]
+        )
+    )
+    context = {"quickGameResultForm": quickGameResultForm}
+    return render(request, "home/game-report-quick.html", context)
+
+
+@login_required(login_url="/login/")
+def gameReportRoster(request, pk):
+    game = Game.objects.get(id=pk)
+    homeTeamPlayers = game.homeTeam.player_set.values()
+    awayTeamPlayers = game.awayTeam.player_set.values()
+    formsetHomeTeam = GameResultRosterFormSet(queryset=Player.objects.none(), prefix="home")
+    formsetAwayTeam = GameResultRosterFormSet(queryset=Player.objects.none(), prefix="away")
+
+    if request.method == "POST":
+        if "submitRoster" in request.POST:
+            # Holds a list of The players where the box was checked indicating that they played
+            homePlayedList = request.POST.getlist('homePlayed')
+            awayPlayedList = request.POST.getlist('awayPlayed')
+
+            formsetHome = GameResultRosterFormSet(data=request.POST, prefix="home")
+            formsetAway = GameResultRosterFormSet(data=request.POST, prefix="away")
+
+            # Used to hold the IDs of newly added players, will be used if we need to delete a newly added player
+            newHomePlayerList = []
+            newAwayPlayerList = []
+
+            if formsetHome.is_valid():
+                for form in formsetHome:
+                    newPlayer = form.save(commit=False)
+                    newPlayer.team = game.homeTeam
+                    newPlayer.save()
+                    newHomePlayerList.append(str(newPlayer.id))
+
+            if formsetAway.is_valid():
+                for form in formsetAway:
+                    newPlayer = form.save(commit=False)
+                    newPlayer.team = game.awayTeam
+                    newPlayer.save()
+                    newAwayPlayerList.append(str(newPlayer.id))
+
+            request.session["homePlayersPlayed"] = homePlayedList
+            request.session["awayPlayersPlayed"] = awayPlayedList
+            request.session["newHomePlayerList"] = newHomePlayerList
+            request.session["newAwayPlayerList"] = newAwayPlayerList
+
+            return redirect("gameReportStats", pk)
+
+    context = {
+        "game": game,
+        "homeTeamPlayers": homeTeamPlayers,
+        "awayTeamPlayers": awayTeamPlayers,
+        "formsetHomeTeam": formsetHomeTeam,
+        "formsetAwayTeam": formsetAwayTeam,
+    }
+
+    return render(request, "home/game-report-roster.html", context)
+
+
+@login_required(login_url="/login/")
+def gameReportStats(request, pk):
+    game = Game.objects.get(id=pk)
+    homePlayedList = request.session["homePlayersPlayed"]
+    awayPlayedList = request.session["awayPlayersPlayed"]
+    newHomePlayerList = request.session["newHomePlayerList"]
+    newAwayPlayerList = request.session["newAwayPlayerList"]
+
+    homePlayersPlayed = Player.objects.filter(Q(id__in=homePlayedList) | Q(id__in=newHomePlayerList))
+    awayPlayersPlayed = Player.objects.filter(Q(id__in=awayPlayedList) | Q(id__in=newAwayPlayerList))
+
+    gameResultForm = GameResultQuickForm(teams=Team.objects.filter(Q(id=game.homeTeam.id) | Q(id=game.awayTeam.id)))
+
+    formsetGoalHome = GoalFormSet(
+        queryset=Goal.objects.none(),
+        form_kwargs={"players": homePlayersPlayed},
+        prefix="goalHome",
+    )
+    formsetGoalAway = GoalFormSet(
+        queryset=Goal.objects.none(),
+        form_kwargs={"players": awayPlayersPlayed},
+        prefix="goalAway",
+    )
+    formsetPenaltyHome = PenaltyFormSet(
+        queryset=Penalty.objects.none(),
+        form_kwargs={"players": homePlayersPlayed},
+        prefix="penaltyHome",
+    )
+    formsetPenaltyAway = PenaltyFormSet(
+        queryset=Penalty.objects.none(),
+        form_kwargs={"players": awayPlayersPlayed},
+        prefix="penaltyAway",
+    )
+
+    context = {
+        "formsetGoalHome": formsetGoalHome,
+        "formsetPenaltyHome": formsetPenaltyHome,
+        "formsetGoalAway": formsetGoalAway,
+        "formsetPenaltyAway": formsetPenaltyAway,
+        "gameResultForm": gameResultForm,
+        "game": game
+    }
+
+    if request.method == "POST":
+        formsetGoalHome = GoalFormSet(data=request.POST, form_kwargs={"players": homePlayersPlayed}, prefix="goalHome")
+        formsetGoalAway = GoalFormSet(data=request.POST, form_kwargs={"players": awayPlayersPlayed}, prefix="goalAway")
+        formsetPenaltyHome = PenaltyFormSet(data=request.POST, form_kwargs={"players": homePlayersPlayed},
+                                            prefix="penaltyHome")
+        formsetPenaltyAway = PenaltyFormSet(data=request.POST, form_kwargs={"players": awayPlayersPlayed},
+                                            prefix="penaltyAway")
+        gameResultForm = GameResultQuickForm(request.POST,
+                                             teams=Team.objects.filter(Q(id=game.homeTeam.id) | Q(id=game.awayTeam.id)))
+
+        if formsetGoalHome.is_valid():
+            for form in formsetGoalHome:
+                newGoal = form.save(commit=False)
+                print(newGoal)
+        if formsetGoalAway.is_valid():
+            for form in formsetGoalAway:
+                newGoal = form.save(commit=False)
+                print(newGoal)
+        if formsetPenaltyHome.is_valid():
+            for form in formsetPenaltyHome:
+                newPenalty = form.save(commit=False)
+                print(newPenalty)
+        if formsetPenaltyAway.is_valid():
+            for form in formsetPenaltyAway:
+                newPenalty = form.save(commit=False)
+                print(newPenalty)
+
+        if gameResultForm.is_valid():
+            print(gameResultForm.cleaned_data)
+
+        return redirect("home")
+
+    return render(request, "home/game-report-stats.html", context)
 
 
 # ALL OLD VIEWS BELOW
@@ -265,196 +447,6 @@ def addDivision(request):
             return redirect("home")
     context = {"form": form}
     return render(request, "home/add-division.html", context)
-
-
-
-@login_required(login_url="/login/")
-def selectGame(request):
-    games = Game.objects.all().values(
-        "iceSlot__date", "homeTeam__name", "awayTeam__name", "id"
-    )
-    context = {"games": games}
-    return render(request, "home/select-game.html", context)
-
-
-@login_required(login_url="/login/")
-def gameReportRoster(request, pk):
-    game = Game.objects.get(id=pk)
-    homeTeam = Team.objects.get(id=game.homeTeam_id)
-    awayTeam = Team.objects.get(id=game.awayTeam_id)
-    currentSeason = Season.objects.get(currentSeason=True)
-
-    if request.method == "POST":
-        if "submitRoster" in request.POST:
-            print("submitRoster Was Pressed")
-
-            print('request.POST.getlist("homePlayed")')
-            print(request.POST.getlist("homePlayed"))
-
-            # homePlayedList = request.POST.getlist('homePlayed')
-            # awayPlayedList = request.POST.getlist('awayPlayed')
-
-            formsetHome = PlayerFormSet(data=request.POST, prefix="home")
-            formsetAway = PlayerFormSet(request.POST, prefix="away")
-
-            homePlayedList = processPlayedList(
-                request.POST.getlist("homePlayed"), formsetHome, homeTeam, currentSeason
-            )
-            awayPlayedList = processPlayedList(
-                request.POST.getlist("awayPlayed"), formsetAway, awayTeam, currentSeason
-            )
-
-            homePlayersPlayed = Player.objects.filter(id__in=homePlayedList)
-            awayPlayersPlayed = Player.objects.filter(id__in=awayPlayedList)
-
-            tempGameResult = TempGameResults(game=game)
-            tempGameResult.save()
-
-            tempGameResult.homePlayers.set(homePlayersPlayed)
-            tempGameResult.awayPlayers.set(awayPlayersPlayed)
-
-            return redirect("gameReportStats", game.id)
-
-            # return gameReportStats(request, game)
-
-    gameTest = Game.objects.filter(id="fc4cd6db-d7f9-43b3-aa80-f9d4abfff0e5").values(
-        "homeTeam__id",
-        "homeTeam__player__playerstats__player__firstName",
-        "homeTeam__player__playerstats__player__lastName",
-        "homeTeam__player__playerstats__player__jerseyNumber",
-        "homeTeam__player__playerstats__player__id",
-        "awayTeam__id",
-        "awayTeam__player__playerstats__player__firstName",
-        "awayTeam__player__playerstats__player__lastName",
-        "awayTeam__player__playerstats__player__jerseyNumber",
-        "awayTeam__player__playerstats__player__id",
-    )
-    homeTeamPlayers = (
-        PlayerStats.objects.filter(player__team__id=homeTeam.id)
-            .all()
-            .values(
-            "player__firstName",
-            "player__lastName",
-            "player__jerseyNumber",
-            "player__id",
-        )
-            .order_by("player__lastName")
-    )
-    awayTeamPlayers = (
-        PlayerStats.objects.filter(player__team__id=awayTeam.id)
-            .all()
-            .values(
-            "player__firstName",
-            "player__lastName",
-            "player__jerseyNumber",
-            "player__id",
-        )
-            .order_by("player__lastName")
-    )
-    formsetHomeTeam = PlayerFormSet(queryset=Player.objects.none(), prefix="home")
-    formsetAwayTeam = PlayerFormSet(queryset=Player.objects.none(), prefix="away")
-
-    context = {
-        "homeTeam": homeTeam,
-        "awayTeam": awayTeam,
-        "homeTeamPlayers": homeTeamPlayers,
-        "awayTeamPlayers": awayTeamPlayers,
-        "formsetHomeTeam": formsetHomeTeam,
-        "formsetAwayTeam": formsetAwayTeam,
-    }
-
-    return render(request, "home/game-report-roster.html", context)
-
-
-@login_required(login_url="/login/")
-def gameReportStats(request, gameId):
-    game = Game.objects.get(id=gameId)
-    tempGameResult = TempGameResults.objects.get(game__id=gameId)
-    # teams = Team.objects.filter(id__in=teamList)
-    homeTeam = Team.objects.get(id=game.homeTeam_id)
-    awayTeam = Team.objects.get(id=game.awayTeam_id)
-    teamList = [homeTeam.id, awayTeam.id]
-    teams = Team.objects.filter(id__in=teamList)
-    homePlayersPlayed = PlayerStats.objects.filter(
-        player__id__in=tempGameResult.homePlayers.values_list("id")
-    )
-    awayPlayersPlayed = PlayerStats.objects.filter(
-        player_id__in=tempGameResult.awayPlayers.values_list("id")
-    )
-
-    gameResultForm = GameResultForm(teams=teams)
-
-    formsetGoalHome = GoalFormSet(
-        queryset=Goal.objects.none(),
-        form_kwargs={"players": homePlayersPlayed},
-        prefix="goalHome",
-    )
-    formsetGoalAway = GoalFormSet(
-        queryset=Goal.objects.none(),
-        form_kwargs={"players": awayPlayersPlayed},
-        prefix="goalAway",
-    )
-    formsetPenaltyHome = PenaltyFormSet(
-        queryset=Penalty.objects.none(),
-        form_kwargs={"players": homePlayersPlayed},
-        prefix="penaltyHome",
-    )
-    formsetPenaltyAway = PenaltyFormSet(
-        queryset=Penalty.objects.none(),
-        form_kwargs={"players": awayPlayersPlayed},
-        prefix="penaltyAway",
-    )
-
-    context = {
-        "formsetGoalHome": formsetGoalHome,
-        "formsetPenaltyHome": formsetPenaltyHome,
-        "formsetGoalAway": formsetGoalAway,
-        "formsetPenaltyAway": formsetPenaltyAway,
-        "gameResultForm": gameResultForm,
-        "homeTeam": homeTeam,
-        "awayTeam": awayTeam,
-    }
-
-    if request.method == "POST":
-        print("Test")
-        formsetGoalHome = GoalFormSet(
-            data=request.POST,
-            form_kwargs={"players": homePlayersPlayed},
-            prefix="goalHome",
-        )
-        formsetGoalAway = GoalFormSet(
-            data=request.POST,
-            form_kwargs={"players": awayPlayersPlayed},
-            prefix="goalAway",
-        )
-        formsetPenaltyHome = PenaltyFormSet(
-            data=request.POST,
-            form_kwargs={"players": homePlayersPlayed},
-            prefix="penaltyHome",
-        )
-        formsetPenaltyAway = PenaltyFormSet(
-            data=request.POST,
-            form_kwargs={"players": awayPlayersPlayed},
-            prefix="penaltyAway",
-        )
-        processGoals(formsetGoalHome, game)
-
-    #     if 'submitAll' in request.POST:
-    #         formsetPenalty2 = PenaltyFormSet(data=request.POST, prefix='penalty')
-    #         formsetGoal2 = GoalFormSet(data=request.POST, prefix='goal')
-    #         print(formsetPenalty2)
-    #         print(formsetGoal2)
-    return render(request, "home/game-report-stats.html", context)
-
-
-# @login_required(login_url="/login/")
-# class GameReportStats(View):
-#     template_name = 'home/game-report-stats.html'
-#     gameResultForm = None
-#     formsetGoal = None
-#     formsetPenalty = None
-#
-#     def get(self, request, *args, **kwargs):
 
 
 # We will need to modify this to make it so it doesn't actually update games played until we confirm the results

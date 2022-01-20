@@ -1,45 +1,93 @@
 # Form for scorekeeper entering in game results
 # 1. Enter in the box score, goals per period for each team
 # 2. Then you press the next button which submits that, and enters individual goals
-# TODO Create a "Goal" Model to store a goal
 from django.forms import *
 from django import forms
 from .models import *
 
 
-class GameResultForm(ModelForm):
+class GameResultRosterForm(ModelForm):
+    class Meta:
+        model = Player
+        fields = {"firstName", "lastName", "jerseyNumber"}
+
+    def __init__(self, *args, **kwargs):
+        super(GameResultRosterForm, self).__init__(*args, **kwargs)
+        self.fields["firstName"].label = "First Name"
+        self.fields["firstName"].widget = TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "First Name",
+                "id": "firstName",
+                "required": "required",
+            }
+        )
+        self.fields["lastName"].label = "Last Name"
+        self.fields["lastName"].widget = TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Last Name",
+                "id": "lastName",
+                "required": "required",
+            }
+        )
+        self.fields["jerseyNumber"].label = "Jersey #"
+        self.fields["jerseyNumber"].widget = TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Jersey #",
+                "id": "jerseyNumber",
+                "required": "required",
+            }
+        )
+
+
+GameResultRosterFormSet = modelformset_factory(
+    model=Player, form=GameResultRosterForm, extra=1
+)
+
+
+class GameResultQuickForm(ModelForm):
     class Meta:
         model = GameResult
-        fields = {"winningTeam", "losingTeam", "winType", "winnerScore", "loserScore"}
-        labels = {
-            "winningTeam": "Winning Team",
-            "losingTeam": "Losing Team",
-            "winType": "Win Type",
-            "winnerScore": "Winner Score",
-            "loserScore": "Loser Score",
-        }
-        widgets = {
-            "winningTeam": Select(attrs={"class": "form-control", "id": "winningTeam"}),
-            "losingTeam": Select(attrs={"class": "form-control", "id": "losingTeam"}),
-            "winType": Select(attrs={"class": "form-control", "id": "winType"}),
-            "winnerScore": NumberInput(
-                attrs={"class": "form-control", "type": "number", "id": "winnerScore"}
-            ),
-            "loserScore": NumberInput(
-                attrs={"class": "form-control", "type": "number", "id": "loserScore"}
-            ),
-        }
+        fields = {"winningTeam", "losingTeam", "winnerScore", "loserScore", "winType"}
 
     def __init__(self, *args, **kwargs):
         teams = kwargs.pop("teams")
-        super(GameResultForm, self).__init__(*args, **kwargs)
+        super(GameResultQuickForm, self).__init__(*args, **kwargs)
+        self.fields["winningTeam"].label = "Winning Team"
+        self.fields["winningTeam"].widget = Select(
+            attrs={"class": "form-control", "id": "winningTeam", "required": "required"}
+        )
         self.fields["winningTeam"].queryset = teams
+        self.fields["losingTeam"].label = "Losing Team"
+        self.fields["losingTeam"].widget = Select(
+            attrs={"class": "form-control", "id": "losingTeam", "required": "required"}
+        )
         self.fields["losingTeam"].queryset = teams
-        # self.fields['period'].label = 'Period'
-        # self.fields['severity'].label = 'Severity'
-        # self.fields['length'].label = 'Length'
-        # self.fields['type'].label = 'Type'
-        # self.fields['timeCommitted'].label = 'Time'
+        self.fields["winnerScore"].label = "Winner Score"
+        self.fields["winnerScore"].widget = NumberInput(
+            attrs={
+                "class": "form-control",
+                "type": "number",
+                "id": "winnerScore",
+                "required": "required",
+            }
+        )
+        self.fields["loserScore"].label = "Loser Score"
+        self.fields["loserScore"].widget = NumberInput(
+            attrs={
+                "class": "form-control",
+                "type": "number",
+                "id": "loserScore",
+                "required": "required",
+            }
+        )
+        self.fields["winType"].label = "Win Type"
+        self.fields["winType"].widget = Select(
+            attrs={"class": "form-control", "id": "winType", "required": "required"}
+        )
+        self.fields["winType"].choices = GameResult.WIN_TYPES
 
 
 class PenaltyForm(ModelForm):
@@ -71,7 +119,6 @@ class PenaltyForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         players = kwargs.pop("players")
-        print("Goal Form Init Called")
         super(PenaltyForm, self).__init__(*args, **kwargs)
         self.fields["player"].queryset = players
         self.fields["period"].label = "Period"

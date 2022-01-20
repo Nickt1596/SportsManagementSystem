@@ -57,12 +57,59 @@
 
 							<!-- Add Player Form Starts here -->
 							<div class="card-body text-center">
-								<a class="btn btn-fill btn-primary" href="{% url 'iceSlotManager' %}" role="button">Manage Games</a>
-								<a class="btn btn-fill btn-primary" href="{% url 'iceSlotManager' %}" role="button">Manage Ice Slots</a>
-								<a class="btn btn-fill btn-primary" href="{% url 'iceSlotManager' %}" role="button">Manage Seasons</a>
-								<a class="btn btn-fill btn-primary" href="{% url 'iceSlotManager' %}" role="button">Manage Referees</a>
-								<a class="btn btn-fill btn-primary" href="{% url 'iceSlotManager' %}" role="button">Manage Scorekeepers</a>
-								<a class="btn btn-fill btn-primary" href="{% url 'iceSlotManager' %}" role="button">Manage Rinks</a>
+								<div class="dropdown">
+								<button class="btn btn-fill btn-primary dropdown-toggle" type="button"  id="manageGamesDropDown" data-toggle="dropdown">Manage Games</button>
+								<div class="dropdown-menu">
+									<a class="dropdown-item" href="{% url 'gameManager' %}">Add New Games</a>
+									<a class="dropdown-item" href="{% url 'editGames' %}">Edit Games</a>
+									<a class="dropdown-item" href="{% url 'gameManager' %}">Enter Game Report</a>
+									<a class="dropdown-item" href="{% url 'gameManager' %}">Revise Game Report</a>
+								</div>
+								</div>
+
+								<div class="dropdown">
+								<button class="btn btn-fill btn-primary dropdown-toggle" type="button"  id="manageIceSlotsDropDown" data-toggle="dropdown">Manage Ice Slots</button>
+								<div class="dropdown-menu">
+									<a class="dropdown-item" href="{% url 'iceSlotManager' %}">Edit Ice Slots</a>
+							    <a class="dropdown-item" href="{% url 'iceSlotManager' %}">Add New Ice Slots</a>
+								</div>
+								</div>
+
+								<div class="dropdown">
+								<button class="btn btn-fill btn-primary dropdown-toggle" type="button"  id="manageSeasonDropDown" data-toggle="dropdown">Manage Seasons</button>
+								<div class="dropdown-menu">
+									<a class="dropdown-item" href="{% url 'iceSlotManager' %}">Modify Teams</a>
+							    <a class="dropdown-item" href="{% url 'iceSlotManager' %}">Modify Divisions</a>
+									<a class="dropdown-item" href="{% url 'iceSlotManager' %}">Modify Rosters</a>
+									<a class="dropdown-item" href="{% url 'iceSlotManager' %}">Create New Season</a>
+									<a class="dropdown-item" href="{% url 'iceSlotManager' %}">Finalize Current Season</a>
+								</div>
+								</div>
+
+								<div class="dropdown">
+								<button class="btn btn-fill btn-primary dropdown-toggle" type="button"  id="manageRefereesDropDown" data-toggle="dropdown">Manage Referees</button>
+								<div class="dropdown-menu">
+									<a class="dropdown-item" href="{% url 'iceSlotManager' %}">Edit Referees</a>
+							    <a class="dropdown-item" href="{% url 'iceSlotManager' %}">Add New Referees</a>
+								</div>
+								</div>
+
+								<div class="dropdown">
+								<button class="btn btn-fill btn-primary dropdown-toggle" type="button"  id="manageScorekeepersDropDown" data-toggle="dropdown">Manage Scorekeepers</button>
+								<div class="dropdown-menu">
+									<a class="dropdown-item" href="{% url 'iceSlotManager' %}">Edit Scorekeepers</a>
+							    <a class="dropdown-item" href="{% url 'iceSlotManager' %}">Add New Scorekeepers</a>
+								</div>
+								</div>
+
+								<div class="dropdown">
+								<button class="btn btn-fill btn-primary dropdown-toggle" type="button"  id="manageRinksDropDown" data-toggle="dropdown">Manage Rinks</button>
+								<div class="dropdown-menu">
+									<a class="dropdown-item" href="{% url 'iceSlotManager' %}">Edit Rinks</a>
+							    <a class="dropdown-item" href="{% url 'iceSlotManager' %}">Add New Rinks</a>
+								</div>
+								</div>
+
 							</div>
 
 						</div>

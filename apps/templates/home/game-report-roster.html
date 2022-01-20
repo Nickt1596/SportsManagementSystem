@@ -48,7 +48,7 @@
 								<div class="row">
 
 									<div class="col-6">
-										<h3 class="mb-0">{{ homeTeam.name }} Roster </h3>
+										<h3 class="mb-0">{{ game.homeTeam.name }} Roster </h3>
 									</div>
 
 								</div>
@@ -75,12 +75,12 @@
 									{% for player in homeTeamPlayers %}
 										<tr>
 											<td>
-												<input type="checkbox" name="homePlayed" value="{{ player.player__id }}">
+												<input type="checkbox" name="homePlayed" value="{{ player.id }}">
 											</td>
 
-											<td>{{ player.player__firstName }}</td>
-											<td>{{ player.player__lastName }}</td>
-											<td>{{ player.player__jerseyNumber }}</td>
+											<td>{{ player.firstName }}</td>
+											<td>{{ player.lastName }}</td>
+											<td>{{ player.jerseyNumber }}</td>
 
 										</tr>
 									{% endfor %}
@@ -98,7 +98,7 @@
 								<div class="row">
 
 									<div class="col-6">
-										<h3 class="mb-0">{{ awayTeam.name }} Roster </h3>
+										<h3 class="mb-0">{{ game.awayTeam.name }} Roster </h3>
 									</div>
 
 								</div>
@@ -126,11 +126,11 @@
 
 										<tr>
 											<td>
-												<input type="checkbox" name="awayPlayed" value="{{ player.player__id }}">
+												<input type="checkbox" name="awayPlayed" value="{{ player.id }}">
 											</td>
-											<td>{{ player.player__firstName }}</td>
-											<td>{{ player.player__lastName }}</td>
-											<td>{{ player.player__jerseyNumber }}</td>
+											<td>{{ player.firstName }}</td>
+											<td>{{ player.lastName }}</td>
+											<td>{{ player.jerseyNumber }}</td>
 										</tr>
 									{% endfor %}
 
