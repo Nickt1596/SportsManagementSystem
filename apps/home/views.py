@@ -458,7 +458,9 @@ def gameReportStats(request, pk):
             gameResult.game = game
             gameResult.save()
 
-        # Function used to update stats from the games
+        # Function used to update Games Played for the Player Stats
+        playerList = homePlayedList + awayPlayedList + newHomePlayerList + newAwayPlayerList
+        addGamePlayed(playerList)
         return redirect("home")
 
     return render(request, "home/game-report-stats.html", context)
@@ -509,60 +511,9 @@ def addDivision(request):
     return render(request, "home/add-division.html", context)
 
 
-
-
-# # We will need to modify this to make it so it doesn't actually update games played until we confirm the results
-# def processPlayedList(postList, formset, team, currentSeason):
-#     playedList = postList
-#
-#     for player in postList:
-#         playedPlayer = Player.objects.get(id=player)
-#         playerStatObj = PlayerStats.objects.get(player=playedPlayer)
-#         playerStatObj.gamesPlayed = playerStatObj.gamesPlayed + 1
-#         playerStatObj.save()
-#
-#     if formset.is_valid():
-#         for form in formset:
-#             newPlayer = form.save(commit=False)
-#             newPlayer.team = team
-#             newPlayer.save()
-#             playedList.append(newPlayer.id)
-#             try:
-#                 playerStatObj = PlayerStats.objects.get(player=newPlayer)
-#             except:
-#                 print("Player Stats Does not Exist")
-#             else:
-#                 playerStatObj.season = currentSeason
-#                 playerStatObj.gamesPlayed = playerStatObj.gamesPlayed + 1
-#                 playerStatObj.save()
-#
-#     return playedList
-#
-#
-# def processGoals(formset, game):
-#     if formset.is_valid():
-#         for form in formset:
-#             goal = form.save(commit=False)
-#             goal.game = game
-#             goal.save()
-#             updatePlayerStatsGoal(goal.goalScorer)
-#             if goal.assistPrimary is not None:
-#                 updatePlayerStatsAssist(goal.assistPrimary)
-#             if goal.assistSecondary is not None:
-#                 updatePlayerStatsAssist(goal.assistSecondary)
-#
-#
-# def processPenalties(formset, game):
-#     print("Hold")
-#
-#
-# def updatePlayerStatsGoal(goalScorer):
-#     playerStats = PlayerStats.objects.get(id=goalScorer.id)
-#     playerStats.goals = playerStats.goals + 1
-#     playerStats.save()
-#
-#
-# def updatePlayerStatsAssist(goalAssist):
-#     playerStats = PlayerStats.objects.get(id=goalAssist.id)
-#     playerStats.goals = playerStats.assists + 1
-#     playerStats.save()
+# Utility Function used to increment games Played by 1
+def addGamePlayed(playerList):
+    playerStats = PlayerStats.objects.filter(player__id__in=playerList)
+    for player in playerStats:
+        player.gamesPlayed = player.gamesPlayed + 1
+        player.save()
