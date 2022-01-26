@@ -106,12 +106,12 @@ class PlayerStats(models.Model):
 
     def __str__(self):
         return (
-            "#"
-            + self.player.jerseyNumber
-            + " "
-            + self.player.firstName
-            + ". "
-            + self.player.lastName
+                "#"
+                + self.player.jerseyNumber
+                + " "
+                + self.player.firstName
+                + ". "
+                + self.player.lastName
         )
 
 
@@ -254,8 +254,6 @@ class Game(models.Model):
         super().save(*args, **kwargs)
 
 
-
-
 class GameResult(models.Model):
     WIN_TYPES = [
         ("Regulation", "REG"),
@@ -367,15 +365,15 @@ class GameResult(models.Model):
         winningTeamStats = TeamStats.objects.get(team__id=winningTeamId)
         losingTeamStats = TeamStats.objects.get(team__id=losingTeamId)
         winningTeamStats.goalsFor = (
-            winningTeamStats.goalsFor - oldGameResult.winnerScore
+                winningTeamStats.goalsFor - oldGameResult.winnerScore
         )
         winningTeamStats.goalsAgainst = (
-            winningTeamStats.goalsAgainst - oldGameResult.loserScore
+                winningTeamStats.goalsAgainst - oldGameResult.loserScore
         )
         winningTeamStats.save()
         losingTeamStats.goalsFor = losingTeamStats.goalsFor - oldGameResult.loserScore
         losingTeamStats.goalsAgainst = (
-            losingTeamStats.goalsAgainst - oldGameResult.winnerScore
+                losingTeamStats.goalsAgainst - oldGameResult.winnerScore
         )
         losingTeamStats.save()
 
@@ -426,15 +424,15 @@ class Goal(models.Model):
                 self.removeGoal(oldGoal.goalScorer.id)
                 self.addGoal(self.goalScorer.id)
             if (
-                self.assistPrimary is not None
-                and self.assistPrimary.id != oldGoal.assistPrimary.id
+                    self.assistPrimary is not None
+                    and self.assistPrimary.id != oldGoal.assistPrimary.id
             ):
                 self.addAssist(self.assistPrimary.id)
                 if oldGoal.assistPrimary is not None:
                     self.removeAssist(oldGoal.assistPrimary.id)
             if (
-                self.assistSecondary is not None
-                and self.assistSecondary.id != oldGoal.assistSecondary.id
+                    self.assistSecondary is not None
+                    and self.assistSecondary.id != oldGoal.assistSecondary.id
             ):
                 self.addAssist(self.assistSecondary.id)
                 if oldGoal.assistSecondary is not None:
