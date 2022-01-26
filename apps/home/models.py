@@ -236,6 +236,25 @@ class Game(models.Model):
     def __str__(self):
         return self.homeTeam.name + " vs " + self.awayTeam.name
 
+    # Overriding Save Method to mark the iceSlot selected as available or not available
+    def save(self, *args, **kwargs):
+        created = self._state.adding is True
+        if created:
+            iceslot = IceSlot.objects.get(id=self.iceSlot.id)
+            iceslot.available = False
+            iceslot.save()
+        else:
+            oldGame = Game.objects.get(id=self.id)
+            oldIceSlot = IceSlot.objects.get(id=oldGame.iceSlot.id)
+            oldIceSlot.available = True
+            oldIceSlot.save()
+            iceslot = IceSlot.objects.get(id=self.iceSlot.id)
+            iceslot.available = False
+            iceslot.save()
+        super().save(*args, **kwargs)
+
+
+
 
 class GameResult(models.Model):
     WIN_TYPES = [
