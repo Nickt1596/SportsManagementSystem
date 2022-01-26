@@ -53,8 +53,8 @@ def pages(request):
 def adminHome(request):
     gamesNeedRefs = (
         Game.objects.annotate(referee_count=Count("referees"))
-            .filter(referee_count__lt=2)
-            .values(
+        .filter(referee_count__lt=2)
+        .values(
             "iceSlot__date",
             "iceSlot__rink__name",
             "iceSlot__time",
@@ -64,8 +64,8 @@ def adminHome(request):
     )
     gamesNeedScorekeepers = (
         Game.objects.annotate(scorekeeper_count=Count("scorekeeper"))
-            .filter(scorekeeper_count__lt=1)
-            .values(
+        .filter(scorekeeper_count__lt=1)
+        .values(
             "iceSlot__date",
             "iceSlot__rink__name",
             "iceSlot__time",
@@ -112,7 +112,7 @@ def teamPage(request, pk):
     )
     playerStats = (
         PlayerStats.objects.filter(player__team__id=pk)
-            .values(
+        .values(
             "player__firstName",
             "player__lastName",
             "player__jerseyNumber",
@@ -123,12 +123,12 @@ def teamPage(request, pk):
             "points",
             "penaltyMins",
         )
-            .order_by("points")
+        .order_by("points")
     )
 
     teamSchedule = (
         Game.objects.filter(Q(homeTeam__id=pk) | Q(awayTeam__id=pk))
-            .values(
+        .values(
             "homeTeam__name",
             "awayTeam__name",
             "iceSlot__date",
@@ -140,7 +140,7 @@ def teamPage(request, pk):
             "gameresult__loserScore",
             "gameresult__winType",
         )
-            .order_by("iceSlot__date")
+        .order_by("iceSlot__date")
     )
 
     context = {
@@ -180,7 +180,7 @@ def rinks(request):
 def schedule(request):
     schedule = (
         Game.objects.all()
-            .values(
+        .values(
             "homeTeam__name",
             "awayTeam__name",
             "iceSlot__date",
@@ -193,7 +193,7 @@ def schedule(request):
             "gameresult__loserScore",
             "gameresult__winType",
         )
-            .order_by("iceSlot__date")
+        .order_by("iceSlot__date")
     )
     context = {"schedule": schedule}
     return render(request, "home/schedule.html", context)
@@ -233,7 +233,7 @@ def gameManager(request):
 def editGames(request):
     games = (
         Game.objects.all()
-            .values(
+        .values(
             "homeTeam__name",
             "awayTeam__name",
             "iceSlot__date",
@@ -246,12 +246,16 @@ def editGames(request):
             "gameresult__loserScore",
             "gameresult__winType",
         )
-            .order_by("iceSlot__date")
+        .order_by("iceSlot__date")
     )
     context = {"games": games}
     return render(request, "home/edit-games.html", context)
 
 
+"""
+Stage 1 of the Game Report Function - Game Selection
+User has the option to enter a Quick Report or Full Report
+"""
 @login_required(login_url="/login/")
 def gameReportSelectGame(request):
     games = Game.objects.all().values(
@@ -261,31 +265,50 @@ def gameReportSelectGame(request):
     return render(request, "home/game-report-select-game.html", context)
 
 
+"""
+Stage 1a. of the Game Report Function - Quick Report
+User Selects Winning and Losing Team, Winner and Loser Score, and the win Type. 
+User will need to return later to complete the rest of the steps of the Game Report
+"""
 @login_required(login_url="/login/")
 def gameReportQuick(request, pk):
     gameTeams = Game.objects.get(id=pk)
     quickGameResultForm = GameResultQuickForm(
-        teams=Team.objects.filter(
-            id__in=[gameTeams.homeTeam.id, gameTeams.awayTeam.id]
-        )
+        teams=Team.objects.filter(id__in=[gameTeams.homeTeam.id, gameTeams.awayTeam.id])
     )
     context = {"quickGameResultForm": quickGameResultForm}
     return render(request, "home/game-report-quick.html", context)
 
 
+"""
+Stage 2. of the Game Report Function - Full Report - Enter Roster
+Creates a Table w/ Checkbox selection for the roster of the Home and Away Team. 
+Checking the box indicates the player has played in the game. 
+Create a Formset to add a New player for the Home and Away Team
+
+When submitted the following happens 
+1. We create a list of for the Home Players and Away Players that had their checkbox selected. 
+2. We generate the formset for the Home and Away Team, validate the form data and save it to the database
+   as well as save the newPlayer.Id and add it to a list for the respective team. 
+3. These 4 lists get saved to session variables and we redirect to the enter Stats page
+"""
 @login_required(login_url="/login/")
 def gameReportRoster(request, pk):
     game = Game.objects.get(id=pk)
     homeTeamPlayers = game.homeTeam.player_set.values()
     awayTeamPlayers = game.awayTeam.player_set.values()
-    formsetHomeTeam = GameResultRosterFormSet(queryset=Player.objects.none(), prefix="home")
-    formsetAwayTeam = GameResultRosterFormSet(queryset=Player.objects.none(), prefix="away")
+    formsetHomeTeam = GameResultRosterFormSet(
+        queryset=Player.objects.none(), prefix="home"
+    )
+    formsetAwayTeam = GameResultRosterFormSet(
+        queryset=Player.objects.none(), prefix="away"
+    )
 
     if request.method == "POST":
         if "submitRoster" in request.POST:
             # Holds a list of The players where the box was checked indicating that they played
-            homePlayedList = request.POST.getlist('homePlayed')
-            awayPlayedList = request.POST.getlist('awayPlayed')
+            homePlayedList = request.POST.getlist("homePlayed")
+            awayPlayedList = request.POST.getlist("awayPlayed")
 
             formsetHome = GameResultRosterFormSet(data=request.POST, prefix="home")
             formsetAway = GameResultRosterFormSet(data=request.POST, prefix="away")
@@ -326,6 +349,14 @@ def gameReportRoster(request, pk):
     return render(request, "home/game-report-roster.html", context)
 
 
+"""
+Stage 3. of the Game Report Function - Full Report - Enter Stats
+We get our session variables we stored from Roster 
+We then do the following 
+1. Query for the HomePlayersPlayed and AwayPlayersPlay
+2. A gameResult Form 
+3. Formset for Goals and Penalties for the respective teams
+"""
 @login_required(login_url="/login/")
 def gameReportStats(request, pk):
     game = Game.objects.get(id=pk)
@@ -334,10 +365,16 @@ def gameReportStats(request, pk):
     newHomePlayerList = request.session["newHomePlayerList"]
     newAwayPlayerList = request.session["newAwayPlayerList"]
 
-    homePlayersPlayed = Player.objects.filter(Q(id__in=homePlayedList) | Q(id__in=newHomePlayerList))
-    awayPlayersPlayed = Player.objects.filter(Q(id__in=awayPlayedList) | Q(id__in=newAwayPlayerList))
+    homePlayersPlayed = Player.objects.filter(
+        Q(id__in=homePlayedList) | Q(id__in=newHomePlayerList)
+    )
+    awayPlayersPlayed = Player.objects.filter(
+        Q(id__in=awayPlayedList) | Q(id__in=newAwayPlayerList)
+    )
 
-    gameResultForm = GameResultQuickForm(teams=Team.objects.filter(Q(id=game.homeTeam.id) | Q(id=game.awayTeam.id)))
+    gameResultForm = GameResultQuickForm(
+        teams=Team.objects.filter(Q(id=game.homeTeam.id) | Q(id=game.awayTeam.id))
+    )
 
     formsetGoalHome = GoalFormSet(
         queryset=Goal.objects.none(),
@@ -366,39 +403,62 @@ def gameReportStats(request, pk):
         "formsetGoalAway": formsetGoalAway,
         "formsetPenaltyAway": formsetPenaltyAway,
         "gameResultForm": gameResultForm,
-        "game": game
+        "game": game,
     }
 
     if request.method == "POST":
-        formsetGoalHome = GoalFormSet(data=request.POST, form_kwargs={"players": homePlayersPlayed}, prefix="goalHome")
-        formsetGoalAway = GoalFormSet(data=request.POST, form_kwargs={"players": awayPlayersPlayed}, prefix="goalAway")
-        formsetPenaltyHome = PenaltyFormSet(data=request.POST, form_kwargs={"players": homePlayersPlayed},
-                                            prefix="penaltyHome")
-        formsetPenaltyAway = PenaltyFormSet(data=request.POST, form_kwargs={"players": awayPlayersPlayed},
-                                            prefix="penaltyAway")
-        gameResultForm = GameResultQuickForm(request.POST,
-                                             teams=Team.objects.filter(Q(id=game.homeTeam.id) | Q(id=game.awayTeam.id)))
+        homeGoals = []
+        homePenalties = []
+        awayGoals = []
+        awayPenalties = []
+        formsetGoalHome = GoalFormSet(
+            data=request.POST,
+            form_kwargs={"players": homePlayersPlayed},
+            prefix="goalHome",
+        )
+        formsetGoalAway = GoalFormSet(
+            data=request.POST,
+            form_kwargs={"players": awayPlayersPlayed},
+            prefix="goalAway",
+        )
+        formsetPenaltyHome = PenaltyFormSet(
+            data=request.POST,
+            form_kwargs={"players": homePlayersPlayed},
+            prefix="penaltyHome",
+        )
+        formsetPenaltyAway = PenaltyFormSet(
+            data=request.POST,
+            form_kwargs={"players": awayPlayersPlayed},
+            prefix="penaltyAway",
+        )
+        gameResultForm = GameResultQuickForm(
+            request.POST,
+            teams=Team.objects.filter(Q(id=game.homeTeam.id) | Q(id=game.awayTeam.id)),
+        )
 
         if formsetGoalHome.is_valid():
             for form in formsetGoalHome:
-                newGoal = form.save(commit=False)
-                print(newGoal)
+                newGoal = form.save()
+                homeGoals.append(str(newGoal.id))
         if formsetGoalAway.is_valid():
             for form in formsetGoalAway:
-                newGoal = form.save(commit=False)
-                print(newGoal)
+                newGoal = form.save()
+                awayGoals.append(str(newGoal.id))
         if formsetPenaltyHome.is_valid():
             for form in formsetPenaltyHome:
-                newPenalty = form.save(commit=False)
-                print(newPenalty)
+                newPenalty = form.save()
+                homePenalties.append(str(newPenalty.id))
         if formsetPenaltyAway.is_valid():
             for form in formsetPenaltyAway:
-                newPenalty = form.save(commit=False)
-                print(newPenalty)
+                newPenalty = form.save()
+                awayPenalties.append(str(newPenalty.id))
 
         if gameResultForm.is_valid():
-            print(gameResultForm.cleaned_data)
+            gameResult = gameResultForm.save(commit=False)
+            gameResult.game = game
+            gameResult.save()
 
+        # Function used to update stats from the games
         return redirect("home")
 
     return render(request, "home/game-report-stats.html", context)
@@ -449,58 +509,60 @@ def addDivision(request):
     return render(request, "home/add-division.html", context)
 
 
-# We will need to modify this to make it so it doesn't actually update games played until we confirm the results
-def processPlayedList(postList, formset, team, currentSeason):
-    playedList = postList
-
-    for player in postList:
-        playedPlayer = Player.objects.get(id=player)
-        playerStatObj = PlayerStats.objects.get(player=playedPlayer)
-        playerStatObj.gamesPlayed = playerStatObj.gamesPlayed + 1
-        playerStatObj.save()
-
-    if formset.is_valid():
-        for form in formset:
-            newPlayer = form.save(commit=False)
-            newPlayer.team = team
-            newPlayer.save()
-            playedList.append(newPlayer.id)
-            try:
-                playerStatObj = PlayerStats.objects.get(player=newPlayer)
-            except:
-                print("Player Stats Does not Exist")
-            else:
-                playerStatObj.season = currentSeason
-                playerStatObj.gamesPlayed = playerStatObj.gamesPlayed + 1
-                playerStatObj.save()
-
-    return playedList
 
 
-def processGoals(formset, game):
-    if formset.is_valid():
-        for form in formset:
-            goal = form.save(commit=False)
-            goal.game = game
-            goal.save()
-            updatePlayerStatsGoal(goal.goalScorer)
-            if goal.assistPrimary is not None:
-                updatePlayerStatsAssist(goal.assistPrimary)
-            if goal.assistSecondary is not None:
-                updatePlayerStatsAssist(goal.assistSecondary)
-
-
-def processPenalties(formset, game):
-    print("Hold")
-
-
-def updatePlayerStatsGoal(goalScorer):
-    playerStats = PlayerStats.objects.get(id=goalScorer.id)
-    playerStats.goals = playerStats.goals + 1
-    playerStats.save()
-
-
-def updatePlayerStatsAssist(goalAssist):
-    playerStats = PlayerStats.objects.get(id=goalAssist.id)
-    playerStats.goals = playerStats.assists + 1
-    playerStats.save()
+# # We will need to modify this to make it so it doesn't actually update games played until we confirm the results
+# def processPlayedList(postList, formset, team, currentSeason):
+#     playedList = postList
+#
+#     for player in postList:
+#         playedPlayer = Player.objects.get(id=player)
+#         playerStatObj = PlayerStats.objects.get(player=playedPlayer)
+#         playerStatObj.gamesPlayed = playerStatObj.gamesPlayed + 1
+#         playerStatObj.save()
+#
+#     if formset.is_valid():
+#         for form in formset:
+#             newPlayer = form.save(commit=False)
+#             newPlayer.team = team
+#             newPlayer.save()
+#             playedList.append(newPlayer.id)
+#             try:
+#                 playerStatObj = PlayerStats.objects.get(player=newPlayer)
+#             except:
+#                 print("Player Stats Does not Exist")
+#             else:
+#                 playerStatObj.season = currentSeason
+#                 playerStatObj.gamesPlayed = playerStatObj.gamesPlayed + 1
+#                 playerStatObj.save()
+#
+#     return playedList
+#
+#
+# def processGoals(formset, game):
+#     if formset.is_valid():
+#         for form in formset:
+#             goal = form.save(commit=False)
+#             goal.game = game
+#             goal.save()
+#             updatePlayerStatsGoal(goal.goalScorer)
+#             if goal.assistPrimary is not None:
+#                 updatePlayerStatsAssist(goal.assistPrimary)
+#             if goal.assistSecondary is not None:
+#                 updatePlayerStatsAssist(goal.assistSecondary)
+#
+#
+# def processPenalties(formset, game):
+#     print("Hold")
+#
+#
+# def updatePlayerStatsGoal(goalScorer):
+#     playerStats = PlayerStats.objects.get(id=goalScorer.id)
+#     playerStats.goals = playerStats.goals + 1
+#     playerStats.save()
+#
+#
+# def updatePlayerStatsAssist(goalAssist):
+#     playerStats = PlayerStats.objects.get(id=goalAssist.id)
+#     playerStats.goals = playerStats.assists + 1
+#     playerStats.save()

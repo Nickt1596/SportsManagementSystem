@@ -106,12 +106,12 @@ class PlayerStats(models.Model):
 
     def __str__(self):
         return (
-            "#"
-            + self.player.jerseyNumber
-            + " "
-            + self.player.firstName
-            + ". "
-            + self.player.lastName
+                "#"
+                + self.player.jerseyNumber
+                + " "
+                + self.player.firstName
+                + ". "
+                + self.player.lastName
         )
 
 
@@ -288,6 +288,8 @@ class Goal(models.Model):
     assistSecondary = models.ForeignKey(
         Player,
         on_delete=models.CASCADE,
+        blank=True,
+        null=True,
         related_name="Secondary_Assist",
     )
     period = models.CharField(max_length=100, choices=PERIODS)
@@ -297,6 +299,54 @@ class Goal(models.Model):
     id = models.UUIDField(
         default=uuid.uuid4, unique=True, primary_key=True, editable=False
     )
+
+    # Overriding Save Method to update the players stats when a goal is goal is added
+    def save(self, *args, **kwargs):
+        created = self._state.adding is True
+        if created:
+            self.addGoal(self.goalScorer.id)
+            if self.assistPrimary is not None:
+                self.addAssist(self.assistPrimary.id)
+            if self.assistSecondary is not None:
+                self.addAssist(self.assistSecondary.id)
+        else:
+            oldGoal = Goal.objects.get(id=self.id)
+            if self.goalScorer.id != oldGoal.goalScorer.id:
+                self.removeGoal(oldGoal.goalScorer.id)
+                self.addGoal(self.goalScorer.id)
+            if self.assistPrimary is not None and self.assistPrimary.id != oldGoal.assistPrimary.id:
+                self.addAssist(self.assistPrimary.id)
+                if oldGoal.assistPrimary is not None:
+                    self.removeAssist(oldGoal.assistPrimary.id)
+            if self.assistSecondary is not None and self.assistSecondary.id != oldGoal.assistSecondary.id:
+                self.addAssist(self.assistSecondary.id)
+                if oldGoal.assistSecondary is not None:
+                    self.removeAssist(oldGoal.assistSecondary.id)
+        super().save(*args, **kwargs)
+
+    def addGoal(self, playerId):
+        playerStats = PlayerStats.objects.get(player__id=playerId)
+        playerStats.goals = playerStats.goals + 1
+        playerStats.points = playerStats.points + 1
+        playerStats.save()
+
+    def addAssist(self, playerId):
+        playerStats = PlayerStats.objects.get(player__id=playerId)
+        playerStats.assists = playerStats.goals + 1
+        playerStats.points = playerStats.points + 1
+        playerStats.save()
+
+    def removeGoal(self, playerId):
+        playerStats = PlayerStats.objects.get(player__id=playerId)
+        playerStats.goals = playerStats.goals - 1
+        playerStats.points = playerStats.points - 1
+        playerStats.save()
+
+    def removeAssist(self, playerId):
+        playerStats = PlayerStats.objects.get(player__id=playerId)
+        playerStats.assists = playerStats.goals - 1
+        playerStats.points = playerStats.points - 1
+        playerStats.save()
 
 
 class Penalty(models.Model):
@@ -337,10 +387,31 @@ class Penalty(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE)
     date_modified = models.DateTimeField(auto_now=True)
     date_created = models.DateTimeField(auto_now_add=True)
-    game = models.ForeignKey(Game, on_delete=models.CASCADE)
     id = models.UUIDField(
         default=uuid.uuid4, unique=True, primary_key=True, editable=False
     )
+
+    # Overriding Save Method to update the players stats when a goal is goal is added
+    def save(self, *args, **kwargs):
+        created = self._state.adding is True
+        if created:
+            self.addPenaltyMin(self.player.id)
+        else:
+            oldPenalty = Penalty.objects.get(id=self.id)
+            self.removePenaltyMin(oldPenalty.player.id, oldPenalty)
+            self.addPenaltyMin(self.player.id)
+        super().save(*args, **kwargs)
+
+
+    def addPenaltyMin(self, playerId):
+        playerStats = PlayerStats.objects.get(player__id=playerId)
+        playerStats.penaltyMins = playerStats.penaltyMins + int(self.length)
+        playerStats.save()
+
+    def removePenaltyMin(self, playerId, oldPenalty):
+        playerStats = PlayerStats.objects.get(player__id=playerId)
+        playerStats.penaltyMins = playerStats.penaltyMins - int(oldPenalty.length)
+        playerStats.save()
 
 
 def populateDatabases():
