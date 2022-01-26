@@ -39,7 +39,7 @@ class Division(models.Model):
     )
 
     def __str__(self):
-        return self.season.name + ' ' + self.name
+        return self.season.name + " " + self.name
 
 
 class Team(models.Model):
@@ -106,12 +106,12 @@ class PlayerStats(models.Model):
 
     def __str__(self):
         return (
-                "#"
-                + self.player.jerseyNumber
-                + " "
-                + self.player.firstName
-                + ". "
-                + self.player.lastName
+            "#"
+            + self.player.jerseyNumber
+            + " "
+            + self.player.firstName
+            + ". "
+            + self.player.lastName
         )
 
 
@@ -268,6 +268,98 @@ class GameResult(models.Model):
     def __str__(self):
         return self.game.homeTeam.name + " vs " + self.game.awayTeam.name + " Result"
 
+    # Update Team Stats
+    def save(self, *args, **kwargs):
+        created = self._state.adding is True
+        if created:
+            self.updatePoints(self.winningTeam.id, self.losingTeam.id)
+            self.updateGoals(self.winningTeam.id, self.losingTeam.id)
+        else:
+            oldGameResult = GameResult.objects.get(id=self.id)
+            self.removePoints(
+                oldGameResult.winningTeam.id, oldGameResult.losingTeam.id, oldGameResult
+            )
+            self.removeGoals(
+                oldGameResult.winningTeam.id, oldGameResult.losingTeam.id, oldGameResult
+            )
+            self.updatePoints(self.winningTeam.id, self.losingTeam.id)
+            self.updateGoals(self.winningTeam.id, self.losingTeam.id)
+        super().save(*args, **kwargs)
+
+    def updatePoints(self, winningTeamId, losingTeamId):
+        winningTeamStats = TeamStats.objects.get(team__id=winningTeamId)
+        losingTeamStats = TeamStats.objects.get(team__id=losingTeamId)
+        if self.winType == "Regulation":
+            winningTeamStats.regWins += 1
+            winningTeamStats.points += 3
+            winningTeamStats.save()
+            losingTeamStats.regLoses += 1
+            losingTeamStats.save()
+        elif self.winType == "Overtime" or self.winType == "Shootout":
+            winningTeamStats.otWins += 1
+            winningTeamStats.points += 2
+            winningTeamStats.save()
+            losingTeamStats.otLoses += 1
+            losingTeamStats.points += 1
+            losingTeamStats.save()
+        else:
+            winningTeamStats.ties += 1
+            winningTeamStats.points += 1
+            winningTeamStats.save()
+            losingTeamStats.ties += 1
+            losingTeamStats.points += 1
+            losingTeamStats.save()
+
+    def updateGoals(self, winningTeamId, losingTeamId):
+        winningTeamStats = TeamStats.objects.get(team__id=winningTeamId)
+        losingTeamStats = TeamStats.objects.get(team__id=losingTeamId)
+        winningTeamStats.goalsFor = winningTeamStats.goalsFor + self.winnerScore
+        winningTeamStats.goalsAgainst = winningTeamStats.goalsAgainst + self.loserScore
+        winningTeamStats.save()
+        losingTeamStats.goalsFor = losingTeamStats.goalsFor + self.loserScore
+        losingTeamStats.goalsAgainst = losingTeamStats.goalsAgainst + self.winnerScore
+        losingTeamStats.save()
+
+    def removePoints(self, winningTeamId, losingTeamId, oldGameResult):
+        winningTeamStats = TeamStats.objects.get(team__id=winningTeamId)
+        losingTeamStats = TeamStats.objects.get(team__id=losingTeamId)
+        if oldGameResult.winType == "Regulation":
+            winningTeamStats.regWins -= 1
+            winningTeamStats.points -= 3
+            winningTeamStats.save()
+            losingTeamStats.regLoses -= 1
+            losingTeamStats.save()
+        elif oldGameResult.winType == "Overtime" or oldGameResult.winType == "Shootout":
+            winningTeamStats.otWins -= 1
+            winningTeamStats.points -= 2
+            winningTeamStats.save()
+            losingTeamStats.otLoses -= 1
+            losingTeamStats.points -= 1
+            losingTeamStats.save()
+        else:
+            winningTeamStats.ties -= 1
+            winningTeamStats.points -= 1
+            winningTeamStats.save()
+            losingTeamStats.ties -= 1
+            losingTeamStats.points -= 1
+            losingTeamStats.save()
+
+    def removeGoals(self, winningTeamId, losingTeamId, oldGameResult):
+        winningTeamStats = TeamStats.objects.get(team__id=winningTeamId)
+        losingTeamStats = TeamStats.objects.get(team__id=losingTeamId)
+        winningTeamStats.goalsFor = (
+            winningTeamStats.goalsFor - oldGameResult.winnerScore
+        )
+        winningTeamStats.goalsAgainst = (
+            winningTeamStats.goalsAgainst - oldGameResult.loserScore
+        )
+        winningTeamStats.save()
+        losingTeamStats.goalsFor = losingTeamStats.goalsFor - oldGameResult.loserScore
+        losingTeamStats.goalsAgainst = (
+            losingTeamStats.goalsAgainst - oldGameResult.winnerScore
+        )
+        losingTeamStats.save()
+
 
 class Goal(models.Model):
     PERIODS = [("1", "1"), ("2", "2"), ("3", "3"), ("OT", "OT")]
@@ -314,11 +406,17 @@ class Goal(models.Model):
             if self.goalScorer.id != oldGoal.goalScorer.id:
                 self.removeGoal(oldGoal.goalScorer.id)
                 self.addGoal(self.goalScorer.id)
-            if self.assistPrimary is not None and self.assistPrimary.id != oldGoal.assistPrimary.id:
+            if (
+                self.assistPrimary is not None
+                and self.assistPrimary.id != oldGoal.assistPrimary.id
+            ):
                 self.addAssist(self.assistPrimary.id)
                 if oldGoal.assistPrimary is not None:
                     self.removeAssist(oldGoal.assistPrimary.id)
-            if self.assistSecondary is not None and self.assistSecondary.id != oldGoal.assistSecondary.id:
+            if (
+                self.assistSecondary is not None
+                and self.assistSecondary.id != oldGoal.assistSecondary.id
+            ):
                 self.addAssist(self.assistSecondary.id)
                 if oldGoal.assistSecondary is not None:
                     self.removeAssist(oldGoal.assistSecondary.id)
@@ -391,7 +489,6 @@ class Penalty(models.Model):
         default=uuid.uuid4, unique=True, primary_key=True, editable=False
     )
 
-    # Overriding Save Method to update the players stats when a goal is goal is added
     def save(self, *args, **kwargs):
         created = self._state.adding is True
         if created:
@@ -401,7 +498,6 @@ class Penalty(models.Model):
             self.removePenaltyMin(oldPenalty.player.id, oldPenalty)
             self.addPenaltyMin(self.player.id)
         super().save(*args, **kwargs)
-
 
     def addPenaltyMin(self, playerId):
         playerStats = PlayerStats.objects.get(player__id=playerId)
@@ -820,11 +916,11 @@ def generateRinks():
     ]
     for i in range(len(rinkList)):
         rink = Rink(
-            name=rinkList[i]['name'],
-            streetAddress=rinkList[i]['streetAddress'],
-            city=rinkList[i]['city'],
-            state=rinkList[i]['state'],
-            zip=rinkList[i]['zip'],
-            phoneNumber=rinkList[i]['phoneNumber']
+            name=rinkList[i]["name"],
+            streetAddress=rinkList[i]["streetAddress"],
+            city=rinkList[i]["city"],
+            state=rinkList[i]["state"],
+            zip=rinkList[i]["zip"],
+            phoneNumber=rinkList[i]["phoneNumber"],
         )
         rink.save()
