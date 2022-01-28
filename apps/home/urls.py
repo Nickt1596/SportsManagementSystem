@@ -22,10 +22,21 @@ urlpatterns = [
     path('game-report-quick/<str:pk>', views.gameReportQuick, name="gameReportQuick"),
     path('game-report-stats/<str:pk>', views.gameReportStats, name="gameReportStats"),
 
+    path('rinks/', views.rinks, name="rinks"),
+    path('add-rink/', views.addRink, name="addRink"),
+    path('update-rink/<str:pk>', views.updateRink, name="updateRink"),
+
+    path('scorekeepers/', views.scorekeepers, name="scorekeepers"),
+    path('add-scorekeeper/', views.addScorekeeper, name="addScorekeeper"),
+    path('update-updatescorekeeper/<str:pk>', views.updateScorekeeper, name="updateScorekeeper"),
+
+    path('referees/', views.referees, name="referees"),
+    path('add-referee/', views.addReferee, name="addReferee"),
+    path('update-updatereferee/<str:pk>', views.updateReferee, name="updateReferee"),
+
 
     # URLS still needing updating below
     path('add-division/', views.addDivision, name="addDivision"),
-    path('rinks/', views.rinks, name="rinks"),
     path('create-new-season/', views.addSeason, name="addSeason"),
     path('game-report-roster/<str:pk>', views.gameReportRoster, name="gameReportRoster"),
     path('game-report-stats/<str:gameId>', views.gameReportStats, name="gameReportStats"),

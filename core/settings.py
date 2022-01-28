@@ -32,9 +32,12 @@ INSTALLED_APPS = [
     'django_extensions',
     "debug_toolbar",
     'bootstrap_modal_forms',
-    'apps.home',  # Enable the inner home (home)
+    'apps.home',
+    'apps.authentication'# Enable the inner home (home)
 
 ]
+
+AUTH_USER_MODEL = 'authentication.CustomUser'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

@@ -107,12 +107,12 @@ class PlayerStats(models.Model):
 
     def __str__(self):
         return (
-                "#"
-                + self.player.jerseyNumber
-                + " "
-                + self.player.firstName
-                + ". "
-                + self.player.lastName
+            "#"
+            + self.player.jerseyNumber
+            + " "
+            + self.player.firstName
+            + ". "
+            + self.player.lastName
         )
 
 
@@ -138,8 +138,12 @@ class TeamStats(models.Model):
 
 
 class Scorekeeper(models.Model):
-
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
+        limit_choices_to={"type": "SCOREKEEPER"},
+    )
     name = models.CharField(max_length=80)
     phoneNumber = models.CharField(max_length=80)
     email = models.CharField(max_length=80)
@@ -154,6 +158,12 @@ class Scorekeeper(models.Model):
 
 
 class Referee(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
+        limit_choices_to={"type": "REFEREE"},
+    )
     name = models.CharField(max_length=80)
     phoneNumber = models.CharField(max_length=80)
     email = models.CharField(max_length=80)
@@ -368,15 +378,15 @@ class GameResult(models.Model):
         winningTeamStats = TeamStats.objects.get(team__id=winningTeamId)
         losingTeamStats = TeamStats.objects.get(team__id=losingTeamId)
         winningTeamStats.goalsFor = (
-                winningTeamStats.goalsFor - oldGameResult.winnerScore
+            winningTeamStats.goalsFor - oldGameResult.winnerScore
         )
         winningTeamStats.goalsAgainst = (
-                winningTeamStats.goalsAgainst - oldGameResult.loserScore
+            winningTeamStats.goalsAgainst - oldGameResult.loserScore
         )
         winningTeamStats.save()
         losingTeamStats.goalsFor = losingTeamStats.goalsFor - oldGameResult.loserScore
         losingTeamStats.goalsAgainst = (
-                losingTeamStats.goalsAgainst - oldGameResult.winnerScore
+            losingTeamStats.goalsAgainst - oldGameResult.winnerScore
         )
         losingTeamStats.save()
 
@@ -427,15 +437,15 @@ class Goal(models.Model):
                 self.removeGoal(oldGoal.goalScorer.id)
                 self.addGoal(self.goalScorer.id)
             if (
-                    self.assistPrimary is not None
-                    and self.assistPrimary.id != oldGoal.assistPrimary.id
+                self.assistPrimary is not None
+                and self.assistPrimary.id != oldGoal.assistPrimary.id
             ):
                 self.addAssist(self.assistPrimary.id)
                 if oldGoal.assistPrimary is not None:
                     self.removeAssist(oldGoal.assistPrimary.id)
             if (
-                    self.assistSecondary is not None
-                    and self.assistSecondary.id != oldGoal.assistSecondary.id
+                self.assistSecondary is not None
+                and self.assistSecondary.id != oldGoal.assistSecondary.id
             ):
                 self.addAssist(self.assistSecondary.id)
                 if oldGoal.assistSecondary is not None:

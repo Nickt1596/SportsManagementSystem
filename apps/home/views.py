@@ -17,6 +17,8 @@ from .forms import *
 
 @login_required(login_url="/login/")
 def index(request):
+    if request.user.type == 'COMMISSIONER':
+        return redirect(adminHome)
     context = {"segment": "index"}
 
     html_template = loader.get_template("home/index.html")
@@ -53,8 +55,8 @@ def pages(request):
 def adminHome(request):
     gamesNeedRefs = (
         Game.objects.annotate(referee_count=Count("referees"))
-        .filter(referee_count__lt=2)
-        .values(
+            .filter(referee_count__lt=2)
+            .values(
             "iceSlot__date",
             "iceSlot__rink__name",
             "iceSlot__time",
@@ -64,8 +66,8 @@ def adminHome(request):
     )
     gamesNeedScorekeepers = (
         Game.objects.annotate(scorekeeper_count=Count("scorekeeper"))
-        .filter(scorekeeper_count__lt=1)
-        .values(
+            .filter(scorekeeper_count__lt=1)
+            .values(
             "iceSlot__date",
             "iceSlot__rink__name",
             "iceSlot__time",
@@ -112,7 +114,7 @@ def teamPage(request, pk):
     )
     playerStats = (
         PlayerStats.objects.filter(player__team__id=pk)
-        .values(
+            .values(
             "player__firstName",
             "player__lastName",
             "player__jerseyNumber",
@@ -123,12 +125,12 @@ def teamPage(request, pk):
             "points",
             "penaltyMins",
         )
-        .order_by("points")
+            .order_by("points")
     )
 
     teamSchedule = (
         Game.objects.filter(Q(homeTeam__id=pk) | Q(awayTeam__id=pk))
-        .values(
+            .values(
             "homeTeam__name",
             "awayTeam__name",
             "iceSlot__date",
@@ -140,7 +142,7 @@ def teamPage(request, pk):
             "gameresult__loserScore",
             "gameresult__winType",
         )
-        .order_by("iceSlot__date")
+            .order_by("iceSlot__date")
     )
 
     context = {
@@ -177,12 +179,27 @@ def rinks(request):
 
 
 @login_required(login_url="/login/")
+def scorekeepers(request):
+    scorekeepers = Scorekeeper.objects.all().values()
+    context = {"scorekeepers": scorekeepers}
+    return render(request, "home/scorekeepers.html", context)
+
+@login_required(login_url="/login/")
+def referees(request):
+    referees = Referee.objects.all().values()
+    context = {"referees": referees}
+    return render(request, "home/referees.html", context)
+
+
+@login_required(login_url="/login/")
 def schedule(request):
     schedule = (
         Game.objects.all()
-        .values(
+            .values(
             "homeTeam__name",
+            "homeTeam__id",
             "awayTeam__name",
+            "awayTeam__id",
             "iceSlot__date",
             "iceSlot__time",
             "iceSlot__rink__name",
@@ -193,7 +210,7 @@ def schedule(request):
             "gameresult__loserScore",
             "gameresult__winType",
         )
-        .order_by("iceSlot__date")
+            .order_by("iceSlot__date")
     )
     context = {"schedule": schedule}
     return render(request, "home/schedule.html", context)
@@ -233,7 +250,7 @@ def gameManager(request):
 def editGames(request):
     games = (
         Game.objects.all()
-        .values(
+            .values(
             "homeTeam__name",
             "awayTeam__name",
             "iceSlot__date",
@@ -246,7 +263,7 @@ def editGames(request):
             "gameresult__loserScore",
             "gameresult__winType",
         )
-        .order_by("iceSlot__date")
+            .order_by("iceSlot__date")
     )
     context = {"games": games}
     return render(request, "home/edit-games.html", context)
@@ -256,6 +273,8 @@ def editGames(request):
 Stage 1 of the Game Report Function - Game Selection
 User has the option to enter a Quick Report or Full Report
 """
+
+
 @login_required(login_url="/login/")
 def gameReportSelectGame(request):
     games = Game.objects.all().values(
@@ -270,6 +289,8 @@ Stage 1a. of the Game Report Function - Quick Report
 User Selects Winning and Losing Team, Winner and Loser Score, and the win Type. 
 User will need to return later to complete the rest of the steps of the Game Report
 """
+
+
 @login_required(login_url="/login/")
 def gameReportQuick(request, pk):
     gameTeams = Game.objects.get(id=pk)
@@ -292,6 +313,8 @@ When submitted the following happens
    as well as save the newPlayer.Id and add it to a list for the respective team. 
 3. These 4 lists get saved to session variables and we redirect to the enter Stats page
 """
+
+
 @login_required(login_url="/login/")
 def gameReportRoster(request, pk):
     game = Game.objects.get(id=pk)
@@ -357,6 +380,8 @@ We then do the following
 2. A gameResult Form 
 3. Formset for Goals and Penalties for the respective teams
 """
+
+
 @login_required(login_url="/login/")
 def gameReportStats(request, pk):
     game = Game.objects.get(id=pk)
@@ -464,6 +489,87 @@ def gameReportStats(request, pk):
         return redirect("home")
 
     return render(request, "home/game-report-stats.html", context)
+
+
+@login_required(login_url="/login/")
+def addRink(request):
+    form = RinkForm()
+    title = "Add Rink"
+    if request.method == 'POST':
+        form = RinkForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('rinks')
+    context = {'form': form, 'title': title}
+    return render(request, "home/generic-form.html", context)
+
+
+@login_required(login_url="/login/")
+def updateRink(request, pk):
+    rink = Rink.objects.get(id=pk)
+    form = RinkForm(instance=rink)
+    title = "Update " + str(rink.name)
+    if request.method == 'POST':
+        form = RinkForm(request.POST, instance=rink)
+        if form.is_valid():
+            form.save()
+            return redirect('rinks')
+    context = {'form': form, 'title': title}
+    return render(request, "home/generic-form.html", context)
+
+
+@login_required(login_url="/login/")
+def addScorekeeper(request):
+    form = ScorekeeperForm()
+    title = "Add Scorekeeper"
+    if request.method == 'POST':
+        form = ScorekeeperForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('scorekeepers')
+    context = {'form': form, 'title': title}
+    return render(request, "home/generic-form.html", context)
+
+
+@login_required(login_url="/login/")
+def updateScorekeeper(request, pk):
+    scorekeeper = Scorekeeper.objects.get(id=pk)
+    form = ScorekeeperForm(instance=scorekeeper)
+    title = "Update " + str(scorekeeper.name)
+    if request.method == 'POST':
+        form = ScorekeeperForm(request.POST, instance=scorekeeper)
+        if form.is_valid():
+            form.save()
+            return redirect('scorekeepers')
+    context = {'form': form, 'title': title}
+    return render(request, "home/generic-form.html", context)
+
+
+@login_required(login_url="/login/")
+def addReferee(request):
+    form = RefereeForm()
+    title = "Add Referee"
+    if request.method == 'POST':
+        form = RefereeForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('referees')
+    context = {'form': form, 'title': title}
+    return render(request, "home/generic-form.html", context)
+
+
+@login_required(login_url="/login/")
+def updateReferee(request, pk):
+    referee = Referee.objects.get(id=pk)
+    form = RefereeForm(instance=referee)
+    title = "Update " + str(referee.name)
+    if request.method == 'POST':
+        form = RefereeForm(request.POST, instance=referee)
+        if form.is_valid():
+            form.save()
+            return redirect('referees')
+    context = {'form': form, 'title': title}
+    return render(request, "home/generic-form.html", context)
 
 
 # ALL OLD VIEWS BELOW

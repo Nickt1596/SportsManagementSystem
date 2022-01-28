@@ -47,9 +47,16 @@
 						<h3 class="mb-0">Rinks</h3>
 					</div>
 					<div class="table-responsive py-4">
+					{% if user.type == 'COMMISSIONER' or user.is_superuser %}
+					<form method="POST">
+						{% csrf_token %}
+					{% endif %}
 						<table class="table table-flush" id="datatable-basic">
 							<thead class="thead-light">
 							<tr>
+								{% if user.type == 'COMMISSIONER' or user.is_superuser %}
+								<th>Edit</th>
+								{% endif %}
 								<th>Name</th>
 								<th>Address</th>
 								<th>City</th>
@@ -60,6 +67,9 @@
 							</thead>
 							<tfoot>
 							<tr>
+								{% if user.type == 'COMMISSIONER' or user.is_superuser %}
+								<th>Edit</th>
+								{% endif %}
 								<th>Name</th>
 								<th>Address</th>
 								<th>City</th>
@@ -71,6 +81,9 @@
 							<tbody>
 							{% for rink in rinks %}
 								<tr>
+									{% if user.type == 'COMMISSIONER' or user.is_superuser %}
+									<td><a class="btn btn-sm btn-primary" id="editButton" href="{% url 'updateRink' rink.id %}">Edit</a></td>
+									{% endif %}
 									<td>{{ rink.name }}</td>
 									<td>{{ rink.streetAddress }}</td>
 									<td>{{ rink.city }}</td>
@@ -81,6 +94,7 @@
 							{% endfor %}
 							</tbody>
 						</table>
+						</form>
 					</div>
 				</div>
 			</div>

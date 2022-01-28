@@ -540,7 +540,7 @@ class RinkForm(ModelForm):
         self.fields["streetAddress"].widget = TextInput(
             attrs={
                 "class": "form-control",
-                "placeholder": "Rink Name",
+                "placeholder": "Address",
                 "id": "streetAddress",
                 "required": "required",
             }

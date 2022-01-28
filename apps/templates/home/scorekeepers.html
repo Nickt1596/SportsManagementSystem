@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Schedule {% endblock %}
+{% block title %} Scorekeeper Table {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
@@ -22,13 +22,9 @@
 						<h6 class="h2 text-white d-inline-block mb-0">League Info</h6>
 						<nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
 							<ol class="breadcrumb breadcrumb-links breadcrumb-dark">
-								<li class="breadcrumb-item active" aria-current="page">Schedule</li>
+								<li class="breadcrumb-item active" aria-current="page">Scorekeepers</li>
 							</ol>
 						</nav>
-					</div>
-					<div class="col-lg-6 col-5 text-right">
-						{#						              <a href="#" class="btn btn-sm btn-neutral">New</a>#}
-						{#						              <a href="#" class="btn btn-sm btn-neutral">Filters</a>#}
 					</div>
 				</div>
 			</div>
@@ -39,60 +35,57 @@
 	<div class="container-fluid mt--6">
 
 		<!-- Table -->
-		<div class="row card-wrapper">
-
+		<div class="row">
 			<div class="col">
 				<div class="card">
-
-					<div class="card-header border-0">
-						<div class="row">
-							<div class="col text-center">
-								<h3 class="mb-0">Schedule</h3>
-							</div>
-						</div>
+					<!-- Card header -->
+					<div class="card-header">
+						<h3 class="mb-0">Scorekeepers</h3>
 					</div>
-
-					<!-- Light table -->
-					{% for date in schedule %}
-					{% ifchanged %}
 					<div class="table-responsive py-4">
-						<table class="table align-items-center table-flush table-hover" id="gameDate">
+					{% if user.type == 'COMMISSIONER' or user.is_superuser %}
+					<form method="POST">
+						{% csrf_token %}
+					{% endif %}
+						<table class="table table-flush" id="datatable-basic">
 							<thead class="thead-light">
 							<tr>
-								<div class="col text-left">
-								<h3> {{ date.iceSlot__date }}</h3>
-								</div>
-							</tr>
-							<tr>
-								<th>Time</th>
-								<th>Away</th>
-								<th>Home</th>
-								<th>Rink</th>
+								{% if user.type == 'COMMISSIONER' or user.is_superuser %}
+								<th>Edit</th>
+								{% endif %}
+								<th>Name</th>
+								<th>Phone Number</th>
+								<th>Email</th>
 							</tr>
 							</thead>
-
-							<tbody>
-							{% for game in schedule %}
-								{% if date.iceSlot__date == game.iceSlot__date %}
+							<tfoot>
 							<tr>
-								<td class="text-left">{{ game.iceSlot__time }}</td>
-								<td class="text-left"><a href="{% url 'teamPage' game.awayTeam__id %}" class="nav-link">{{ game.awayTeam__name }}</a></td>
-								<td class="text-left"><a href="{% url 'teamPage' game.homeTeam__id %}" class="nav-link">{{ game.homeTeam__name }}</a></td>
-								<td class="text-left">{{ game.iceSlot__rink__name }}</td>
+								{% if user.type == 'COMMISSIONER' or user.is_superuser %}
+								<th>Edit</th>
+								{% endif %}
+								<th>Name</th>
+								<th>Phone Number</th>
+								<th>Email</th>
 							</tr>
-							{% endif %}
+							</tfoot>
+							<tbody>
+							{% for scorekeeper in scorekeepers %}
+								<tr>
+									{% if user.type == 'COMMISSIONER' or user.is_superuser %}
+									<td><a class="btn btn-sm btn-primary" id="editButton" href="{% url 'updateScorekeeper' scorekeeper.id %}">Edit</a></td>
+									{% endif %}
+									<td>{{ scorekeeper.name }}</td>
+									<td>{{ scorekeeper.phoneNumber }}</td>
+									<td>{{ scorekeeper.email }}</td>
+								</tr>
 							{% endfor %}
-
 							</tbody>
 						</table>
+						</form>
 					</div>
-					{% endifchanged %}
-				{% endfor %}
-
 				</div>
 			</div>
 		</div>
-
 
 		{% include 'includes/footer.html' %}
 
@@ -112,16 +105,5 @@
 	<script src="/static/assets/vendor/datatables.net-buttons/js/buttons.flash.min.js"></script>
 	<script src="/static/assets/vendor/datatables.net-buttons/js/buttons.print.min.js"></script>
 	<script src="/static/assets/vendor/datatables.net-select/js/dataTables.select.min.js"></script>
-{#		<script>#}
-{#		$(document).ready( function () {#}
-{#    $('#gameDate').DataTable(#}
-{#        {#}
-{#		        "paging":   false,#}
-{#		        "searching":   false,#}
-{#		        "info":   false,#}
-{#        }#}
-{#    );#}
-{#} );#}
-{#</script>#}
 
 {% endblock javascripts %}
