@@ -32,7 +32,7 @@ INSTALLED_APPS = [
     'django_extensions',
     "debug_toolbar",
     'bootstrap_modal_forms',
-    'apps.home'  # Enable the inner home (home)
+    'apps.home',  # Enable the inner home (home)
 
 ]
 

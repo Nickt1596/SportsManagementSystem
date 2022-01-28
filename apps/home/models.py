@@ -4,6 +4,7 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 from django.db import models
+from django.conf import settings
 from django.contrib.auth.models import User
 import uuid
 from decimal import *
@@ -137,6 +138,8 @@ class TeamStats(models.Model):
 
 
 class Scorekeeper(models.Model):
+
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=80)
     phoneNumber = models.CharField(max_length=80)
     email = models.CharField(max_length=80)
