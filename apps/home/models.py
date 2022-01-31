@@ -6,11 +6,15 @@ Copyright (c) 2019 - present AppSeed.us
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.db.models import Q
+
+from apps.authentication.models import CustomUser
 import uuid
 from decimal import *
 from datetime import *
 import names
 import random
+from faker import Faker
 
 
 class Season(models.Model):
@@ -66,12 +70,21 @@ class Team(models.Model):
 class Player(models.Model):
     # One Team, Many Players
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        limit_choices_to=Q(type="PLAYER") | Q(type="CAPTAIN"),
+    )
     firstName = models.CharField(max_length=80)
     lastName = models.CharField(max_length=80)
     jerseyNumber = models.CharField(max_length=3)
     position = models.CharField(max_length=80, blank=True, null=True)
-    captain = models.BooleanField(default=False)
-    altCaptain = models.BooleanField(default=False)
+    email = models.CharField(max_length=80, blank=True, null=True)
+    phoneNumber = models.CharField(max_length=80, blank=True, null=True)
+    isCaptain = models.BooleanField(default=False)
+    isAltCaptain = models.BooleanField(default=False)
     date_modified = models.DateTimeField(auto_now=True)
     date_created = models.DateTimeField(auto_now_add=True)
     id = models.UUIDField(
@@ -83,11 +96,81 @@ class Player(models.Model):
 
     def save(self, *args, **kwargs):
         if self._state.adding is True:
-            super().save(*args, **kwargs)
             playerStats = PlayerStats(player_id=self.id)
             playerStats.save()
+            if self.email is not None and self.user is None:
+                if self.checkIfCaptain():
+                    self.user = self.createUser("CAPTAIN")
+                else:
+                    self.user = self.createUser("PLAYER")
+        else:
+            oldPlayer = Player.objects.get(id=self.id)
+            if oldPlayer.user is not None:
+                if self.checkIfNewCaptain(oldPlayer):
+                    self.user = self.updateUser("CAPTAIN")
+                elif self.checkIfFormerCaptain(oldPlayer):
+                    self.user = self.updateUser("PLAYER")
+                if oldPlayer.email != self.email:
+                    self.user = self.updateEmail()
+            else:
+                if self.email is not None:
+                    if self.checkIfCaptain():
+                        self.user = self.createUser("CAPTAIN")
+                    else:
+                        self.user = self.createUser("PLAYER")
+        super().save(*args, **kwargs)
 
-        # return '#' + self.jerseyNumber + ' ' + self.firstName[0] + '. ' + self.lastName
+    def checkIfCaptain(self):
+        return self.isCaptain is True or self.isAltCaptain is True
+
+    def checkIfNewCaptain(self, oldPlayer):
+        return (
+                       oldPlayer.isCaptain is False
+                       and self.isCaptain is True
+                       or self.isAltCaptain is True
+               ) or (
+                       oldPlayer.isAltCaptain is False
+                       and self.isAltCaptain is True
+                       or self.isCaptain is True
+               )
+
+    def checkIfFormerCaptain(self, oldPlayer):
+        return (
+                       oldPlayer.isCaptain is True
+                       and self.isCaptain is False
+                       and self.isAltCaptain is False
+               ) or (
+                       oldPlayer.isAltCaptain is True
+                       and self.isAltCaptain is False
+                       and self.isCaptain is False
+               )
+
+    def createUser(self, type):
+        user = CustomUser(
+            username=self.generateUserName(), email=self.email, password="default", type=type
+        )
+        user.save()
+        return user
+
+    def updateUser(self, type):
+        oldUser = self.user
+        oldUser.type = type
+        oldUser.save()
+        return oldUser
+
+    def updateEmail(self):
+        oldUser = self.user
+        oldUser.email = self.email
+        oldUser.save()
+        return oldUser
+
+    """
+    Helper Method to generate a random username made up of the players Jersey Number, First initial of first name, 
+    last name, and a random integer in case the player plays on multiple teams. 
+    """
+    def generateUserName(self):
+        username = self.jerseyNumber + self.firstName[0] + self.lastName + str(random.randint(1000, 9999))
+        return username
 
 
 class PlayerStats(models.Model):
@@ -107,12 +190,12 @@ class PlayerStats(models.Model):
 
     def __str__(self):
         return (
-            "#"
-            + self.player.jerseyNumber
-            + " "
-            + self.player.firstName
-            + ". "
-            + self.player.lastName
+                "#"
+                + self.player.jerseyNumber
+                + " "
+                + self.player.firstName
+                + ". "
+                + self.player.lastName
         )
 
 
@@ -142,6 +225,7 @@ class Scorekeeper(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         null=True,
+        blank=True,
         limit_choices_to={"type": "SCOREKEEPER"},
     )
     name = models.CharField(max_length=80)
@@ -156,12 +240,26 @@ class Scorekeeper(models.Model):
     def __str__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        created = self._state.adding is True
+        if created:
+            user = CustomUser(
+                username=self.email,
+                email=self.email,
+                password="default",
+                type="SCOREKEEPER",
+            )
+            user.save()
+            self.user = user
+        super().save(*args, **kwargs)
+
 
 class Referee(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         null=True,
+        blank=True,
         limit_choices_to={"type": "REFEREE"},
     )
     name = models.CharField(max_length=80)
@@ -175,6 +273,19 @@ class Referee(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        created = self._state.adding is True
+        if created:
+            user = CustomUser(
+                username=self.email,
+                email=self.email,
+                password="default",
+                type="REFEREE",
+            )
+            user.save()
+            self.user = user
+        super().save(*args, **kwargs)
 
 
 class Rink(models.Model):
@@ -378,15 +489,15 @@ class GameResult(models.Model):
         winningTeamStats = TeamStats.objects.get(team__id=winningTeamId)
         losingTeamStats = TeamStats.objects.get(team__id=losingTeamId)
         winningTeamStats.goalsFor = (
-            winningTeamStats.goalsFor - oldGameResult.winnerScore
+                winningTeamStats.goalsFor - oldGameResult.winnerScore
         )
         winningTeamStats.goalsAgainst = (
-            winningTeamStats.goalsAgainst - oldGameResult.loserScore
+                winningTeamStats.goalsAgainst - oldGameResult.loserScore
         )
         winningTeamStats.save()
         losingTeamStats.goalsFor = losingTeamStats.goalsFor - oldGameResult.loserScore
         losingTeamStats.goalsAgainst = (
-            losingTeamStats.goalsAgainst - oldGameResult.winnerScore
+                losingTeamStats.goalsAgainst - oldGameResult.winnerScore
         )
         losingTeamStats.save()
 
@@ -437,15 +548,15 @@ class Goal(models.Model):
                 self.removeGoal(oldGoal.goalScorer.id)
                 self.addGoal(self.goalScorer.id)
             if (
-                self.assistPrimary is not None
-                and self.assistPrimary.id != oldGoal.assistPrimary.id
+                    self.assistPrimary is not None
+                    and self.assistPrimary.id != oldGoal.assistPrimary.id
             ):
                 self.addAssist(self.assistPrimary.id)
                 if oldGoal.assistPrimary is not None:
                     self.removeAssist(oldGoal.assistPrimary.id)
             if (
-                self.assistSecondary is not None
-                and self.assistSecondary.id != oldGoal.assistSecondary.id
+                    self.assistSecondary is not None
+                    and self.assistSecondary.id != oldGoal.assistSecondary.id
             ):
                 self.addAssist(self.assistSecondary.id)
                 if oldGoal.assistSecondary is not None:
@@ -538,6 +649,45 @@ class Penalty(models.Model):
         playerStats = PlayerStats.objects.get(player__id=playerId)
         playerStats.penaltyMins = playerStats.penaltyMins - int(oldPenalty.length)
         playerStats.save()
+
+
+def tester():
+    rinks = Rink.objects.all()
+    fake = Faker()
+    for i in range(0, 150):
+        newSlot = IceSlot(
+            rink=random.choice(rinks),
+            date=fake.date_between(start_date="-15d", end_date="+45d"),
+            time=fake.time_object(),
+        )
+        newSlot.save()
+
+    teams = Team.objects.all()
+    scorekeepers = Scorekeeper.objects.all()
+    referees = Referee.objects.all()
+    for i in range(0, 150):
+        iceSlots = IceSlot.objects.filter(available=True)
+        iceslot = random.choice(iceSlots)
+        homeTeam = random.choice(teams)
+        awayTeam = random.choice(teams)
+        while awayTeam == homeTeam:
+            awayTeam = random.choice(teams)
+        scorekeeper = random.choice(scorekeepers)
+        firstRef = random.choice(referees)
+        secondRef = random.choice(referees)
+        while secondRef == firstRef:
+            secondRef = random.choice(referees)
+
+        newGame = Game(
+            homeTeam=homeTeam,
+            awayTeam=awayTeam,
+            iceSlot=iceslot,
+            scorekeeper=scorekeeper,
+            gameType="Regular Season",
+        )
+        newGame.save()
+        newGame.referees.add(firstRef)
+        newGame.referees.add(secondRef)
 
 
 def populateDatabases():

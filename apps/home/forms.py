@@ -371,8 +371,8 @@ class PlayerForm(ModelForm):
             "lastName",
             "jerseyNumber",
             "position",
-            "captain",
-            "altCaptain",
+            "isCaptain",
+            "isAltCaptain",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -424,16 +424,16 @@ class PlayerForm(ModelForm):
             }
         )
 
-        self.fields["captain"].label = "Captain"
-        self.fields["captain"].widget = CheckboxInput(
+        self.fields["isCaptain"].label = "Captain"
+        self.fields["isCaptain"].widget = CheckboxInput(
             attrs={
                 "class": "form-control",
                 "id": "captain",
             }
         )
 
-        self.fields["altCaptain"].label = "Alt Captain"
-        self.fields["altCaptain"].widget = CheckboxInput(
+        self.fields["isAltCaptain"].label = "Alt Captain"
+        self.fields["isAltCaptain"].widget = CheckboxInput(
             attrs={
                 "class": "form-control",
                 "id": "altCaptain",

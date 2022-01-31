@@ -90,3 +90,25 @@ Entering Game Results, requires the following workflow
 
 1. User Selects a game to enter the score for
     - That game.id is needed
+
+
+Player Account Management Business Logic
+
+First we handle when adding a New Player
+1. If New Player isCaptain or altCaptain, then an e-mail is required.
+2. If New Player is not a Captain, if they want an account, they must enter an e-mail.
+
+
+1. Check that isCaptain or altCaptain is true. If True:
+    - Create a custom user of Type Captain and set it to self.user
+2. If not True, we check if an e-mail was entered, if True:
+    - Create a custom user of Type Player and set it to self.user
+
+Then we handle updating an existing player
+1. If oldPlayer had a User Account, we then check for the following
+    - If oldPlayer wasn't a captain, and newPlayer is a captain, update user Type to Captain
+    - If oldPlayer was a captain, and newPlayer is not a captain, update user Type to Player
+    - If oldPlayer.eMail != newPlayer.eMail, we update the user account e-mail to the new e-mail
+2. If oldPlayer doesn't have a User Account, and newPlayer has an e-mail entered
+    - We did what was done in the case of a new Player
+

@@ -62,7 +62,7 @@ def adminHome(request):
             "iceSlot__time",
             "homeTeam__name",
             "awayTeam__name",
-        )
+        ).order_by("iceSlot__date")
     )
     gamesNeedScorekeepers = (
         Game.objects.annotate(scorekeeper_count=Count("scorekeeper"))
@@ -73,12 +73,12 @@ def adminHome(request):
             "iceSlot__time",
             "homeTeam__name",
             "awayTeam__name",
-        )
+        ).order_by("iceSlot__date")
     )
 
     gameNeedResults = Game.objects.filter(
-        ~Exists(GameResult.objects.filter(game=OuterRef("id")))
-    ).values("iceSlot__date", "homeTeam__name", "awayTeam__name", "scorekeeper__name")
+        ~Exists(GameResult.objects.filter(game=OuterRef("id"))), iceSlot__date__lt=date.today()
+    ).values("iceSlot__date", "homeTeam__name", "awayTeam__name", "scorekeeper__name").order_by("iceSlot__date")
 
     todaysGames = Game.objects.filter(iceSlot__date=date.today()).values(
         "iceSlot__date", "iceSlot__time", "homeTeam__name", "awayTeam__name"
@@ -183,6 +183,7 @@ def scorekeepers(request):
     scorekeepers = Scorekeeper.objects.all().values()
     context = {"scorekeepers": scorekeepers}
     return render(request, "home/scorekeepers.html", context)
+
 
 @login_required(login_url="/login/")
 def referees(request):
